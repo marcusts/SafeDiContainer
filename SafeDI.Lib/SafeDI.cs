@@ -43,8 +43,36 @@ namespace SafeDI.Lib
    {
       #region Public Properties
 
+      /// <summary>
+      /// If you create more than one contract for an interface such as IAnimal, and the user tries to Resolve{IAnimal},
+      /// then we do not know what to give you back.  This Boolean determines if we throw an error under these circumstances.
+      /// If you are highly organized and tightly managed, you should probably set this True, which is not the default.
+      /// Otherwise, when we find a bunch of competing candidates for Resolve, we'll give you the first one available.
+      /// </summary>
       bool ThrowOnMultipleResolutions { get; set; }
+
+      /// <summary>
+      /// If you create a storage rule such as IsolatedInstance, but upon resolution, you ask for the same delivered type as SharedDependencyBetweenInstances,
+      /// this is considered to be a form of coercion.  If this Boolean is True, we will throw an error. That is the strictest way to manage the issue.
+      /// The default (false) is loose to prevent unnecessary errors.
+      /// </summary>
       bool ThrowOnStorageRuleCoercion { get; set; }
+
+      /// <summary>
+      /// Registrations occur for base class types.  They are usually delivered as interface types.
+      /// We expect that when you register an interface for Resolve, you will only have one interface for a given base class type.
+      /// 
+      /// So in this example:
+      /// RegisterType(Class1, Interface1)
+      /// 
+      /// You would not also create:
+      /// RegisterType(Class2, Interface1)
+      /// 
+      /// This is considered to be unsafe. If this Boolean is set to True, we will throw an error if we come across such a condition.
+      /// To avoid the error, leave the Boolean at false, where it defaults.
+      /// With the setting false, we will just pick the first available candidate.
+      /// THIS IS SLOPPY... so try to set this Boolean to True and make careful registrations.
+      /// </summary>
       bool ThrowWhenMoreThanOneMasterContractType { get; set; }
 
       #endregion Public Properties
@@ -139,11 +167,38 @@ namespace SafeDI.Lib
 
       #region Public Properties
 
+      /// <summary>
+      /// If you create more than one contract for an interface such as IAnimal, and the user tries to Resolve{IAnimal},
+      /// then we do not know what to give you back.  This Boolean determines if we throw an error under these circumstances.
+      /// If you are highly organized and tightly managed, you should probably set this True, which is not the default.
+      /// Otherwise, when we find a bunch of competing candidates for Resolve, we'll give you the first one available.
+      /// </summary>
       public bool ThrowOnMultipleResolutions { get; set; }
 
+      /// <summary>
+      /// If you create a storage rule such as IsolatedInstance, but upon resolution, you ask for the same delivered type as SharedDependencyBetweenInstances,
+      /// this is considered to be a form of coercion.  If this Boolean is True, we will throw an error. That is the strictest way to manage the issue.
+      /// The default (false) is loose to prevent unnecessary errors.
+      /// </summary>
       public bool ThrowOnStorageRuleCoercion { get; set; }
 
+      /// <summary>
+      /// Registrations occur for base class types.  They are usually delivered as interface types.
+      /// We expect that when you register an interface for Resolve, you will only have one interface for a given base class type.
+      /// 
+      /// So in this example:
+      /// RegisterType(Class1, Interface1)
+      /// 
+      /// You would not also create:
+      /// RegisterType(Class2, Interface1)
+      /// 
+      /// This is considered to be unsafe. If this Boolean is set to True, we will throw an error if we come across such a condition.
+      /// To avoid the error, leave the Boolean at false, where it defaults.
+      /// With the setting false, we will just pick the first available candidate.
+      /// THIS IS SLOPPY... so try to set this Boolean to True and make careful registrations.
+      /// </summary>
       public bool ThrowWhenMoreThanOneMasterContractType { get; set; }
+
 
       #endregion Public Properties
 

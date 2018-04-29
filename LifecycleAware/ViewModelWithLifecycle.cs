@@ -128,17 +128,6 @@ namespace LifecycleAware
 
       #region Public Methods
 
-      public static BindableProperty CreateViewModelWithLifecycleBindableProperty<PropertyTypeT>
-      (
-         string localPropName,
-         PropertyTypeT defaultVal = default(PropertyTypeT),
-         BindingMode bindingMode = BindingMode.OneWay,
-         Action<ViewModelWithLifecycle, PropertyTypeT, PropertyTypeT> callbackAction = null
-      )
-      {
-         return BindableUtils.CreateBindableProperty(localPropName, defaultVal, bindingMode, callbackAction);
-      }
-
       public void Dispose()
       {
          Dispose(true);
