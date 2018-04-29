@@ -26,13 +26,12 @@
 
 namespace LifecycleAware
 {
+   using System;
    using SharedForms.Common.Utils;
    using Xamarin.Forms;
 
-   public interface IReportPageLifecycle : IReportOrMonitorPageLifecycle
+   public interface IReportEndOfLifecycle
    {
-      event EventUtils.GenericDelegate<ContentPage> PageIsAppearing;
-
-      event EventUtils.GenericDelegate<ContentPage> PageIsDisappearing;
+      event EventUtils.GenericDelegate<object> IsDisappearing;
    }
 }

@@ -31,55 +31,45 @@ namespace LifecycleAware
    #region Imports
 
    using System;
+   using System.ComponentModel;
+   using System.Runtime.CompilerServices;
+   using Annotations;
    using SharedForms.Common.Utils;
    using SharedUtils;
    using Xamarin.Forms;
 
    #endregion
 
-   public interface IContentViewWithLifecycle : IDisposable, IReportEndOfLifecycle
+   public interface IViewModelWithLifecycle : IDisposable, INotifyPropertyChanged
    {
       #region Public Properties
 
-      IReportLifecycle LifecycleReporter { get; set; }
+      IReportLifecycle ViewLifecycleReporter { get; set; }
 
       #endregion Public Properties
    }
 
    /// <summary>
-   ///    Use this as the basis of all views if possible. If not possible in a few cases, copy this code
-   ///    into your other classes as-is and it will work the same way.
+   ///    Use this as the basis of all view models if possible. If not possible in a few cases, copy
+   ///    this code into your other classes as-is and it will work the same way.
    /// </summary>
    /// <remarks>
-   ///    REMEMBER to supply the originating page (PageLifecycleReporterProperty), as that is how all of
+   ///    REMEMBER to supply the originating view (PageLifecycleReporterProperty), as that is how all of
    ///    this works. The event ties are weak and therefore non-binding.
    /// </remarks>
-   public class ContentViewWithLifecycle : ContentView, IContentViewWithLifecycle
+   public class ViewModelWithLifecycle : IViewModelWithLifecycle
    {
-      #region Public Variables
-
-      public static BindableProperty PageLifecycleReporterProperty =
-         CreateContentViewWithLifecycleBindableProperty
-         (
-            nameof(LifecycleReporter),
-            default(IReportLifecycle),
-            BindingMode.OneWay,
-            (contentView, oldVal, newVal) => { contentView.LifecycleReporter = newVal; }
-         );
-
-      #endregion Public Variables
-
       #region Private Variables
 
-      private IReportLifecycle _lifecycleReporter;
+      private IReportLifecycle _parentLifecycleReporter;
 
       #endregion Private Variables
 
       #region Public Constructors
 
-      public ContentViewWithLifecycle(IReportLifecycle lifeCycleReporter = null)
+      public ViewModelWithLifecycle(IReportLifecycle lifeCycleReporter = null)
       {
-         LifecycleReporter = lifeCycleReporter;
+         ViewLifecycleReporter = lifeCycleReporter;
       }
 
       #endregion Public Constructors
@@ -87,8 +77,8 @@ namespace LifecycleAware
       #region Protected Properties
 
       /// <summary>
-      ///    Helpful when a view is about to go out of scope, but the parent page containing it is *not*
-      ///    disappearing. The programmer should call Dispose() on this view in that single case. Also,
+      ///    Helpful when a view model is about to go out of scope, but the bound view is *not*
+      ///    disappearing. The programmer should call Dispose() on this view model in that single case. Also,
       ///    if any processes are running, and IsDisposing is true, stop those processes *immediately*.
       ///    The garbage collector is too slow to manage this in a better way for us. Classes are
       ///    surprisingly active until the are finalized unless they implement IDisposable. Finalization
@@ -100,25 +90,25 @@ namespace LifecycleAware
 
       #region Public Events
 
-      public event EventUtils.GenericDelegate<object> IsDisappearing;
+      public event PropertyChangedEventHandler PropertyChanged;
 
       #endregion Public Events
 
       #region Public Properties
 
-      public IReportLifecycle LifecycleReporter
+      public IReportLifecycle ViewLifecycleReporter
       {
-         get => _lifecycleReporter;
+         get => _parentLifecycleReporter;
          set
          {
-            _lifecycleReporter = value;
+            _parentLifecycleReporter = value;
 
-            if (_lifecycleReporter != null)
+            if (_parentLifecycleReporter != null)
             {
                this.SetAnyHandler
                (
-                  handler => _lifecycleReporter.IsDisappearing += OnDisappearing,
-                  handler => _lifecycleReporter.IsDisappearing -= OnDisappearing,
+                  handler => _parentLifecycleReporter.IsDisappearing += OnParentDisappearing,
+                  handler => _parentLifecycleReporter.IsDisappearing -= OnParentDisappearing,
                   (lifecycle, args) => { }
                );
             }
@@ -129,7 +119,7 @@ namespace LifecycleAware
 
       #region Private Destructors
 
-      ~ContentViewWithLifecycle()
+      ~ViewModelWithLifecycle()
       {
          Dispose(false);
       }
@@ -138,12 +128,12 @@ namespace LifecycleAware
 
       #region Public Methods
 
-      public static BindableProperty CreateContentViewWithLifecycleBindableProperty<PropertyTypeT>
+      public static BindableProperty CreateViewModelWithLifecycleBindableProperty<PropertyTypeT>
       (
          string localPropName,
          PropertyTypeT defaultVal = default(PropertyTypeT),
          BindingMode bindingMode = BindingMode.OneWay,
-         Action<ContentViewWithLifecycle, PropertyTypeT, PropertyTypeT> callbackAction = null
+         Action<ViewModelWithLifecycle, PropertyTypeT, PropertyTypeT> callbackAction = null
       )
       {
          return BindableUtils.CreateBindableProperty(localPropName, defaultVal, bindingMode, callbackAction);
@@ -169,22 +159,24 @@ namespace LifecycleAware
          }
       }
 
-      protected virtual void OnDisappearing(object val)
-      {
-         Dispose();
-      }
-
       protected virtual void OnPageAppearing(ContentPage page)
       {
       }
 
+      protected virtual void OnParentDisappearing(object val)
+      {
+         Dispose();
+      }
+
+      [NotifyPropertyChangedInvocator]
+      protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+      {
+         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+      }
+
       protected virtual void ReleaseUnmanagedResources()
       {
-         // Notifies the safe di container and other concerned foreign members
          this.SendViewOrPageDisappearingMessage();
-
-         // Notifies close relatives like view models
-         IsDisappearing?.Invoke(this);
       }
 
       #endregion Protected Methods

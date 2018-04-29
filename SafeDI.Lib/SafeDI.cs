@@ -39,19 +39,22 @@ namespace SafeDI.Lib
 
    #endregion
 
-   public enum StorageRules
+   public interface ISafeDIContainer : IDisposable
    {
-      AnyAccessLevel, // Default for class management
-      IsolatedInstance, // Default for resolving actual variables
-      SharedDependencyBetweenInstances,
-      GlobalSingleton
-   }
+      #region Public Properties
 
-   public interface ISafeDIContainer
-   {
       bool ThrowOnMultipleResolutions { get; set; }
       bool ThrowOnStorageRuleCoercion { get; set; }
       bool ThrowWhenMoreThanOneMasterContractType { get; set; }
+
+      #endregion Public Properties
+
+      #region Public Methods
+
+      /// <summary>
+      ///    Clears all internal lists.
+      /// </summary>
+      void ClearContainer();
 
       /// <summary>
       ///    Called by the deriver whenever a class is about to disappear from view. It is better to
@@ -87,10 +90,29 @@ namespace SafeDI.Lib
       /// <param name="typesToUnregister">The types to remove.</param>
       /// <typeparam name="TParent">The generic parent type</typeparam>
       void UnregisterTypeContracts<TParent>(params Type[] typesToUnregister);
+
+      #endregion Public Methods
+   }
+
+   public enum StorageRules
+   {
+      AnyAccessLevel, // Default for class management
+      IsolatedInstance, // Default for resolving actual variables
+      SharedDependencyBetweenInstances,
+      GlobalSingleton
    }
 
    public class SafeDIContainer : ISafeDIContainer
    {
+      #region Private Destructors
+
+      ~SafeDIContainer()
+      {
+         Dispose(false);
+      }
+
+      #endregion Private Destructors
+
       #region Protected Variables
 
       /// <summary>
@@ -128,6 +150,16 @@ namespace SafeDI.Lib
       #region Public Methods
 
       /// <summary>
+      ///    Clears all internal lists.
+      /// </summary>
+      public void ClearContainer()
+      {
+         _globalSingletons?.Clear();
+         _registeredTypeContracts?.Clear();
+         _sharedInstancesWithBoundMembers?.Clear();
+      }
+
+      /// <summary>
       ///    Called by the deriver whenever a class is about to disappear from view. It is better to
       ///    call this before the finalizer, as that can be extremely late. An example would be
       ///    Xamarin.Forms.ContentPage.OnDisapearing. Other views or view models will have to listen to
@@ -152,6 +184,12 @@ namespace SafeDI.Lib
          RemoveBoundSharedDependencies(containerClass);
       }
 
+      public void Dispose()
+      {
+         Dispose(true);
+         GC.SuppressFinalize(this);
+      }
+
       /// <summary>
       ///    Adds a list of types that the type can be resolved as. Includes creators and storage rules.
       /// </summary>
@@ -162,9 +200,11 @@ namespace SafeDI.Lib
       public void RegisterTypeContracts(Type classT, IDictionary<Type, IProvideCreatorAndStorageRule> creatorsAndRules)
       {
          // ClassT must be a standard public type -- otherwise, can't be instantiated
-         if (!classT.IsPublic || !classT.IsClass || classT.IsGenericType || classT.IsSealed || classT.IsAbstract || classT.IsInterface)
+         if (!classT.IsPublic || !classT.IsClass || classT.IsGenericType || classT.IsSealed || classT.IsAbstract ||
+             classT.IsInterface)
          {
-            throw new ArgumentException("SafeDIContainer: RegisterTypeContracts: Type " + classT + " is must be a standard public type");
+            throw new ArgumentException("SafeDIContainer: RegisterTypeContracts: Type " + classT +
+                                        " is must be a standard public type");
          }
 
          if (_registeredTypeContracts[classT] == null)
@@ -612,6 +652,18 @@ namespace SafeDI.Lib
          _globalSingletons[typeof(ClassT)] = instance;
       }
 
+      protected virtual void Dispose(bool disposing)
+      {
+         ReleaseUnmanagedResources();
+         if (disposing)
+         {
+         }
+      }
+
+      protected virtual void ReleaseUnmanagedResources()
+      {
+      }
+
       /// <summary>
       ///    Removes a bound instance from all shared instances. Also cleans up any orphaned shared instances.
       /// </summary>
@@ -662,9 +714,8 @@ namespace SafeDI.Lib
       {
          var objectType = typeof(ObjectT);
 
-         // Seek these by reference, since we have a valid object.
-         // It's safer considering that any instantiated type can be returned as any implemented interface.
-         // So the type could easily mis-match.
+         // Seek these by reference, since we have a valid object. It's safer considering that any
+         // instantiated type can be returned as any implemented interface. So the type could easily mis-match.
          var foundSharedInstance = _sharedInstancesWithBoundMembers.FirstOrDefault(si => ReferenceEquals(si.Key, obj));
 
          if (foundSharedInstance.IsNotAnEqualObjectTo(default(IDictionary<object, IList<object>>)))
@@ -681,11 +732,11 @@ namespace SafeDI.Lib
       {
          var objectType = typeof(ObjectT);
 
-         // Find the singleton based on the reference and *not* by the type,
-         // as any interface type might be declared, but the constructor could easily hand us a base type.
+         // Find the singleton based on the reference and *not* by the type, as any interface type
+         // might be declared, but the constructor could easily hand us a base type.
          var foundSingleton = _globalSingletons.FirstOrDefault(s => ReferenceEquals(s.Value, obj));
 
-         if (foundSingleton.IsNotAnEqualObjectTo(default(IDictionary<Type,object>)))
+         if (foundSingleton.IsNotAnEqualObjectTo(default(IDictionary<Type, object>)))
          {
             _globalSingletons.Remove(foundSingleton.Key);
          }

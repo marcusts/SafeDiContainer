@@ -1,5 +1,4 @@
 ﻿#region License
-
 // MIT License
 // 
 // Copyright (c) 2018 
@@ -23,62 +22,15 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-
 #endregion
 
 namespace LifecycleAware
 {
-   #region Imports
-
    using SharedForms.Common.Utils;
    using Xamarin.Forms;
 
-   #endregion
-
-   /// <remarks>
-   ///    WARNING: .Net does not provide IContentpage, so references to this interface type *must*
-   ///    type-cast to ContentPage_LCA manually.
-   /// </remarks>
-   public interface IContentPageWithLifecycle : IReportLifecycle
+   public interface IReportLifecycle : IReportOrMonitorPageLifecycle, IReportEndOfLifecycle
    {
-   }
-
-   /// <summary>
-   ///    Use this as the basis of all pages if possible. If not possible in a few cases, copy this code
-   ///    into your other classes as-is and it will work the same way.
-   /// </summary>
-   public class ContentPageWithLifecycle : ContentPage, IContentPageWithLifecycle
-   {
-      #region Public Constructors
-
-      #endregion Public Constructors
-
-      #region Public Events
-
-      public event EventUtils.GenericDelegate<object> IsAppearing;
-
-      public event EventUtils.GenericDelegate<object> IsDisappearing;
-
-      #endregion Public Events
-
-      #region Protected Methods
-
-      protected override void OnAppearing()
-      {
-         base.OnAppearing();
-
-         IsAppearing?.Invoke(this);
-      }
-
-      protected override void OnDisappearing()
-      {
-         base.OnDisappearing();
-
-         IsDisappearing?.Invoke(this);
-
-         this.SendViewOrPageDisappearingMessage();
-      }
-
-      #endregion Protected Methods
+      event EventUtils.GenericDelegate<object> IsAppearing;
    }
 }

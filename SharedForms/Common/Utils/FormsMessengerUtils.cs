@@ -199,7 +199,7 @@ namespace SharedForms.Common.Utils
    {
    }
 
-   public class ViewOrPageDisappearingMessage : GenericMessageWithPayload<VisualElement>
+   public class ObjectDisappearingMessage : GenericMessageWithPayload<object>
    {
    }
 

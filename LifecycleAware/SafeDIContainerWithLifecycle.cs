@@ -1,4 +1,5 @@
 ﻿#region License
+
 // MIT License
 // 
 // Copyright (c) 2018 
@@ -22,32 +23,52 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
 #endregion
 
 namespace LifecycleAware
 {
+   #region Imports
+
    using SafeDI.Lib;
    using SharedForms.Common.Utils;
+
+   #endregion
 
    public interface ISafeDIContainerWithLifecycle : ISafeDIContainer
    {
    }
 
-   /// <summary>
-   /// This container is currently intended to be used for the full life of an app.
-   /// Hence we do not unsubscribe from the messaging center.
-   /// </summary>
-   public class SafeDIContainerWithLifecycle : SafeDIContainer
+   public class SafeDIContainerWithLifecycle : SafeDIContainer, ISafeDIContainerWithLifecycle
    {
+      #region Public Constructors
+
       public SafeDIContainerWithLifecycle()
       {
-         FormsMessengerUtils.Subscribe<ViewOrPageDisappearingMessage>(this, OnViewOrPageDisappearing);
+         FormsMessengerUtils.Subscribe<ObjectDisappearingMessage>(this, OnViewOrPageDisappearing);
       }
 
-      private void OnViewOrPageDisappearing(object sender, ViewOrPageDisappearingMessage args)
+      #endregion Public Constructors
+
+      #region Protected Methods
+
+      protected override void ReleaseUnmanagedResources()
+      {
+         base.ReleaseUnmanagedResources();
+
+         FormsMessengerUtils.Unsubscribe<ObjectDisappearingMessage>(this);
+      }
+
+      #endregion Protected Methods
+
+      #region Private Methods
+
+      private void OnViewOrPageDisappearing(object sender, ObjectDisappearingMessage args)
       {
          // Notify the base container of the change.
          ContainerClassIsDying(args.Payload);
       }
+
+      #endregion Private Methods
    }
 }

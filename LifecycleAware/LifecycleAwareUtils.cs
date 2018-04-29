@@ -31,9 +31,9 @@ namespace LifecycleAware
 
    public static class LifecycleAwareUtils
    {
-      public static void SendViewOrPageDisappearingMessage(this VisualElement view)
+      public static void SendViewOrPageDisappearingMessage(this object obj)
       {
-         FormsMessengerUtils.Send(new ViewOrPageDisappearingMessage {Payload = view});
+         FormsMessengerUtils.Send(new ObjectDisappearingMessage {Payload = obj});
       }
    }
 }

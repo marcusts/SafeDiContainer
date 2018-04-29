@@ -24,7 +24,7 @@
 // SOFTWARE.
 #endregion
 
-namespace LifecycleAware
+namespace SharedUtils
 {
    using System;
 
