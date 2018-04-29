@@ -47,9 +47,128 @@ namespace SafeDI.Lib
       GlobalSingleton
    }
 
-   public class SafeDI
+   public interface ISafeDI
    {
+      bool ThrowOnMultipleResolutions { get; set; }
+      bool ThrowOnStorageRuleCoercion { get; set; }
+      bool ThrowWhenMoreThanOneMasterContractType { get; set; }
+
+      /// <summary>
+      ///    Called by the deriver whenever a class is about to disappear from view. It is better to
+      ///    call this before the finalizer, as that can be extremely late. An example would be
+      ///    Xamarin.Forms.ContentPage.OnDisapearing. Other views or view models will have to listen to
+      ///    the original page event and then notify about their own demise. If this step is skipped,
+      ///    none of the lifecycle protections will occur!
+      /// </summary>
+      /// <param name="containerClass"></param>
+      void ContainerClassIsDying(object containerClass);
+
+      /// <summary>
+      ///    Adds a list of bound instances to a single shared instance.
+      /// </summary>
+      /// <typeparam name="TSharedInstance">The shared instance.</typeparam>
+      /// <param name="sharedInstance">The parent instance.</param>
+      /// <param name="instances">The bound instances.</param>
+      void CreateSharedInstances<TSharedInstance>(TSharedInstance sharedInstance,
+         params object[] instances);
+
+      /// <summary>
+      ///    Adds a key-value pair with a class type and an instance of that class.
+      /// </summary>
+      /// <typeparam name="ClassT">The class type.</typeparam>
+      /// <param name="instance">The instance of the type.</param>
+      void CreateSingletonInstance<ClassT>(ClassT instance);
+
+      /// <summary>
+      ///    Adds a list of types that the type can be resolved as. Includes creators and storage rules.
+      /// </summary>
+      /// <typeparam name="ClassT">The class type that owns the contracts.</typeparam>
+      /// <param name="creatorsAndRules">
+      ///    The list of class creators and rules. The creators can be null.
+      /// </param>
+      void RegisterTypeContracts<ClassT>(IDictionary<Type, IProvideCreatorAndStorageRule> creatorsAndRules);
+
+      /// <summary>
+      ///    Removes a bound instance from all shared instances. Also cleans up any orphaned shared instances.
+      /// </summary>
+      /// <param name="obj"></param>
+      void RemoveBoundSharedDependencies(object obj);
+
+      /// <summary>
+      ///    If the type exists as a shared instance, removes it. Only used if this shared instance is
+      ///    about to go out of view.
+      /// </summary>
+      /// <param name="obj"></param>
+      void RemoveSharedInstance<ObjectT>(ObjectT obj);
+
+      /// <summary>
+      ///    Removes a global instance as long as it is the same type and reference.
+      /// </summary>
+      /// <param name="obj"></param>
+      void RemoveSingletonInstance<ObjectT>(ObjectT obj);
+
+      TypeRequestedT Resolve<TypeRequestedT>
+      (
+         StorageRules ruleRequested = StorageRules.AnyAccessLevel,
+         object boundInstance = null,
+         Func<IEnumerable<IProvideCreatorAndStorageRule>, IProvideCreatorAndStorageRule> multipleContractSelecter = null
+      )
+         where TypeRequestedT : class;
+
+      object Resolve
+      (
+         Type typeRequestedT,
+         StorageRules ruleRequested = StorageRules.AnyAccessLevel,
+         object boundInstance = null,
+         Func<IEnumerable<IProvideCreatorAndStorageRule>, IProvideCreatorAndStorageRule> multipleContractSelecter = null
+      );
+
+      /// <summary>
+      ///    Removes a list of types that the parent type can be resolved as. Includes creators and
+      ///    storage rules.
+      /// </summary>
+      /// <param name="typesToUnregister">The types to remove.</param>
+      /// <typeparam name="TParent">The generic parent type</typeparam>
+      void UnregisterTypeContracts<TParent>(params Type[] typesToUnregister);
+   }
+
+   public class SafeDI : ISafeDI
+   {
+      #region Protected Methods
+
+      protected virtual bool CanManageRegisteredTypeContracts<TParent>(bool addThem,
+         IDictionary<Type, IProvideCreatorAndStorageRule> typesAndRules)
+      {
+         if (typesAndRules.IsEmpty())
+         {
+            return false;
+         }
+
+         if (addThem)
+         {
+            foreach (var type in typesAndRules.Keys)
+            {
+               if (!typeof(TParent).IsMainTypeOrAssignableFromMainType(type))
+               {
+                  throw new ArgumentException("SafeDI: CanManageRegisteredTypeContracts: cannot resolve " +
+                                              typeof(TParent) + " to " +
+                                              type + " because they have no class or interface relationship.");
+               }
+            }
+         }
+
+         return true;
+      }
+
+      #endregion Protected Methods
+
       #region Protected Variables
+
+      /// <summary>
+      ///    A dictionary of global singletons keyed by type. There can only be one each of a given type.
+      /// </summary>
+      protected readonly IDictionary<Type, object> _globalSingletons =
+         new ConcurrentDictionary<Type, object>();
 
       /// <summary>
       ///    Specifies that a type can be resolved as a specific type (can be different as long as
@@ -62,14 +181,8 @@ namespace SafeDI.Lib
       ///    A dictionary of instances that are shared between one ore more other instances. When the
       ///    list of shared instances reaches zero, the main instance is removed.
       /// </summary>
-      protected readonly IDictionary<object, IList<object>> _sharedInstances =
+      protected readonly IDictionary<object, IList<object>> _sharedInstancesWithBoundMembers =
          new ConcurrentDictionary<object, IList<object>>();
-
-      /// <summary>
-      ///    A dictionary of global singletons keyed by type. There can only be one each of a given type.
-      /// </summary>
-      protected readonly IDictionary<Type, object> _singletonInstances =
-         new ConcurrentDictionary<Type, object>();
 
       #endregion Protected Variables
 
@@ -84,6 +197,31 @@ namespace SafeDI.Lib
       #endregion Public Properties
 
       #region Public Methods
+
+      /// <summary>
+      ///    Called by the deriver whenever a class is about to disappear from view. It is better to
+      ///    call this before the finalizer, as that can be extremely late. An example would be
+      ///    Xamarin.Forms.ContentPage.OnDisapearing. Other views or view models will have to listen to
+      ///    the original page event and then notify about their own demise. If this step is skipped,
+      ///    none of the lifecycle protections will occur!
+      /// </summary>
+      /// <param name="containerClass"></param>
+      public virtual void ContainerClassIsDying(object containerClass)
+      {
+         // Remove the class from the global singletons
+         RemoveSingletonInstance(containerClass.GetType());
+
+         // See if the shared instances contain the class/ There are two scenarios here:
+         // 1. This class is the shared class. If so, we remove the entire node that contains the
+         //    container class.
+
+         // This only removes if it exists.
+         RemoveSharedInstance(containerClass.GetType());
+
+         // 2. This class is bound to a shared class. If true, we remove that single part of the
+         //    node. However, if this is the last node, then we do as with #1 -- we kill the entire node.
+         RemoveBoundSharedDependencies(containerClass);
+      }
 
       /// <summary>
       ///    Adds a list of bound instances to a single shared instance.
@@ -120,13 +258,12 @@ namespace SafeDI.Lib
             }
          }
 
-         var boundInstances = _sharedInstances[sharedInstance];
-
+         var boundInstances = _sharedInstancesWithBoundMembers[sharedInstance];
 
          if (boundInstances == null)
          {
             boundInstances = new List<object>();
-            _sharedInstances.Add(sharedInstance, boundInstances);
+            _sharedInstancesWithBoundMembers.Add(sharedInstance, boundInstances);
             return;
          }
 
@@ -146,13 +283,13 @@ namespace SafeDI.Lib
       /// <param name="instance">The instance of the type.</param>
       public void CreateSingletonInstance<ClassT>(ClassT instance)
       {
-         if (_singletonInstances[typeof(ClassT)] != null)
+         if (_globalSingletons[typeof(ClassT)] != null)
          {
             Debug.WriteLine("SafeDI: CreateSingletonInstance: Over-writing an existing singleton of type " +
-                            _singletonInstances[typeof(ClassT)].GetType());
+                            _globalSingletons[typeof(ClassT)].GetType());
          }
 
-         _singletonInstances[typeof(ClassT)] = instance;
+         _globalSingletons[typeof(ClassT)] = instance;
       }
 
       /// <summary>
@@ -179,20 +316,19 @@ namespace SafeDI.Lib
       }
 
       /// <summary>
-      /// Removes a bound instance from all shared instances.
-      /// Also cleans up any orphaned shared instances.
+      ///    Removes a bound instance from all shared instances. Also cleans up any orphaned shared instances.
       /// </summary>
       /// <param name="obj"></param>
       public void RemoveBoundSharedDependencies(object obj)
       {
-         if (_sharedInstances.IsEmpty())
+         if (_sharedInstancesWithBoundMembers.IsEmpty())
          {
             return;
          }
 
          var sharedInstancesToDelete = new List<object>();
 
-         foreach (var sharedInstance in _sharedInstances)
+         foreach (var sharedInstance in _sharedInstancesWithBoundMembers)
          {
             var foundBoundMembers = sharedInstance.Value.Where(si => ReferenceEquals(si, obj)).ToArray();
 
@@ -216,32 +352,37 @@ namespace SafeDI.Lib
          // Remove the shared instances that are now orphaned
          foreach (var sharedInstance in sharedInstancesToDelete)
          {
-            _sharedInstances.Remove(sharedInstance);
+            _sharedInstancesWithBoundMembers.Remove(sharedInstance);
          }
       }
 
       /// <summary>
-      ///    Removes the dictionary entry for the instance of a parent class type.
+      ///    If the type exists as a shared instance, removes it. Only used if this shared instance is
+      ///    about to go out of view.
       /// </summary>
-      /// <param name="classT">The type of singleton to remove.</param>
-      public void RemoveSingletonInstance(Type classT)
+      /// <param name="obj"></param>
+      public void RemoveSharedInstance<ObjectT>(ObjectT obj)
       {
-         if (_singletonInstances.ContainsKey(classT))
+         var objectType = typeof(ObjectT);
+
+         if (_sharedInstancesWithBoundMembers.ContainsKey(objectType) &&
+             ReferenceEquals(_sharedInstancesWithBoundMembers[objectType], obj))
          {
-            _singletonInstances.Remove(classT);
+            _sharedInstancesWithBoundMembers.Remove(objectType);
          }
       }
 
       /// <summary>
-      /// If the type exists as a shared instance, removes it.
-      /// Only used if this shared instance is about to go out of view.
+      ///    Removes a global instance as long as it is the same type and reference.
       /// </summary>
-      /// <param name="type"></param>
-      public void RemoveSharedInstance(Type type)
+      /// <param name="obj"></param>
+      public void RemoveSingletonInstance<ObjectT>(ObjectT obj)
       {
-         if (_sharedInstances.ContainsKey(type))
+         var objectType = typeof(ObjectT);
+
+         if (_globalSingletons.ContainsKey(objectType) && ReferenceEquals(_globalSingletons[objectType], obj))
          {
-            _sharedInstances.Remove(type);
+            _globalSingletons.Remove(objectType);
          }
       }
 
@@ -400,7 +541,7 @@ namespace SafeDI.Lib
          // Check for existing global singletons
          if (ruleRequested == StorageRules.GlobalSingleton)
          {
-            var foundGlobalInstance = _singletonInstances.FirstOrDefault(si => si.GetType() == typeRequestedT).Value;
+            var foundGlobalInstance = _globalSingletons.FirstOrDefault(si => si.GetType() == typeRequestedT).Value;
 
             if (foundGlobalInstance != null)
             {
@@ -420,7 +561,8 @@ namespace SafeDI.Lib
          // because it is completely separate from the global instance case.
          else if (ruleRequested == StorageRules.SharedDependencyBetweenInstances)
          {
-            var foundSharedInstance = _sharedInstances.FirstOrDefault(si => si.Key.GetType() == typeRequestedT);
+            var foundSharedInstance =
+               _sharedInstancesWithBoundMembers.FirstOrDefault(si => si.Key.GetType() == typeRequestedT);
 
             // If valid (not empty)
             if (foundSharedInstance.IsNotAnEqualObjectTo(default(KeyValuePair<object, IList<object>>)))
@@ -600,137 +742,5 @@ namespace SafeDI.Lib
       }
 
       #endregion Public Methods
-
-      #region Protected Methods
-
-      protected virtual bool CanManageRegisteredTypeContracts<TParent>(bool addThem,
-         IDictionary<Type, IProvideCreatorAndStorageRule> typesAndRules)
-      {
-         if (typesAndRules.IsEmpty())
-         {
-            return false;
-         }
-
-         if (addThem)
-         {
-            foreach (var type in typesAndRules.Keys)
-            {
-               if (!typeof(TParent).IsMainTypeOrAssignableFromMainType(type))
-               {
-                  throw new ArgumentException("SafeDI: CanManageRegisteredTypeContracts: cannot resolve " +
-                                              typeof(TParent) + " to " +
-                                              type + " because they have no class or interface relationship.");
-               }
-            }
-         }
-
-         return true;
-      }
-
-      /// <summary>
-      ///    This list is "backwards" -- The key is an object which we instantiate (or which the user's
-      ///    creator function instantiates).
-      /// </summary>
-      /// <typeparam name="TSharedInstance">The type of the shared instance</typeparam>
-      /// <param name="sharedInstance">The actual shared instance</param>
-      /// <param name="addThem"></param>
-      /// <param name="instances"></param>
-      protected virtual void ManageSharedInstances<TSharedInstance>(TSharedInstance sharedInstance, bool addThem,
-         object[] instances)
-      {
-         if (!addThem && !_sharedInstances.ContainsKey(typeof(TSharedInstance)))
-         {
-            return;
-         }
-
-         // Use the same type checker that we apply to the type dependency case. These are instances
-         // of *types*
-         var instanceTypes = instances.Select(i => i.GetType()).ToArray();
-
-         if (addThem)
-         {
-            var illegalTypes = instanceTypes.Where(t => t.IsMainTypeOrAssignableFromMainType(typeof(TSharedInstance)))
-               .ToList();
-
-            if (illegalTypes.IsNotEmpty())
-            {
-               // Report the first error.
-               throw new ArgumentException("SafeDI: ManageSharedInstances: cannot share " + illegalTypes[0] +
-                                           " with itself, even if derived.");
-            }
-
-            // Verify that the instance types are *not* directly assignable from the shared instance, as
-            // that is circular.
-            foreach (var type in instanceTypes)
-            {
-               if (type.IsMainTypeOrAssignableFromMainType(typeof(TSharedInstance)))
-               {
-                  throw new ArgumentException("SafeDI: ManageSharedInstances: " + type +
-                                              " is an illegal circular reference back to the parent " +
-                                              typeof(TSharedInstance));
-               }
-            }
-         }
-
-         var boundInstances = _sharedInstances[sharedInstance];
-
-         if (!addThem && boundInstances.IsEmpty())
-         {
-            return;
-         }
-
-         if (boundInstances == null && addThem)
-         {
-            boundInstances = new List<object>();
-            _sharedInstances.Add(sharedInstance, boundInstances);
-         }
-
-         foreach (var instance in instances)
-         {
-            var found = boundInstances.Contains(instance);
-
-            if (addThem)
-            {
-               if (!found)
-               {
-                  boundInstances.Add(instance);
-               }
-            }
-            else
-            {
-               if (found)
-               {
-                  boundInstances.Remove(instance);
-               }
-            }
-         }
-      }
-
-      #endregion Protected Methods
-
-      /// <summary>
-      /// Called by the deriver whenever a class is about to disappear from view.
-      /// It is better to call this before the finalizer, as that can be extremely late.
-      /// An example would be Xamarin.Forms.ContentPage.OnDisapearing.
-      /// Other views or view models will have to listen to the original page event and then notify about their own demise.
-      /// If this step is skipped, none of the lifecycle protections will occur!
-      /// </summary>
-      /// <param name="containerClass"></param>
-      public virtual void ContainerClassIsDying(object containerClass)
-      {
-         // Remove the class from the global singletons
-         RemoveSingletonInstance(containerClass.GetType());
-
-         // See if the shared instances contain the class/
-         // There are two scenarios here:
-         // 1. This class is the shared class.  If so, we remove the entire node that contains the container class.
-
-         // This only removes if it exists.
-         RemoveSharedInstance(containerClass.GetType());
-
-         // 2. This class is bound to a shared class.  If true, we remove that single part of the node.
-         //    However, if this is the last node, then we do as with #1 -- we kill the entire node.
-         RemoveBoundSharedDependencies(containerClass);
-      }
    }
 }
