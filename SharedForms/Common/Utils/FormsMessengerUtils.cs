@@ -199,6 +199,10 @@ namespace SharedForms.Common.Utils
    {
    }
 
+   public class ViewOrPageDisappearingMessage : GenericMessageWithPayload<VisualElement>
+   {
+   }
+
    public class PageLifecycleMessage : GenericMessageWithPayload<IPageLifecycleMessageArgs>
    {
       #region Public Constructors

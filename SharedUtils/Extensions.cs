@@ -35,6 +35,18 @@ namespace SharedForms.Common.Utils
 
    public static class Extensions
    {
+      #region Private Variables
+
+      private const double NUMERIC_ERROR = 0.001;
+
+      #endregion Private Variables
+
+      #region Public Properties
+
+      public static bool? EmptyNullableBool => new bool?();
+
+      #endregion Public Properties
+
       //public static readonly Random GLOBAL_RANDOM = new Random((int)DateTime.Now.Ticks & 0x0000FFFF);
 
       //private const double NUMERIC_ERROR = 0.001;
@@ -162,7 +174,7 @@ namespace SharedForms.Common.Utils
          foreach (var propInfo in propInfos)
          {
             // If we have a single property, only allow that one through.
-            if (singlePropertyName.IsNotEmpty() && propInfo.Name.IsDifferentThan(singlePropertyName))
+            if (singlePropertyName.IsNotEmpty<char>() && propInfo.Name.IsDifferentThan(singlePropertyName))
             {
                continue;
             }
@@ -194,7 +206,7 @@ namespace SharedForms.Common.Utils
             return newErrorText;
          }
 
-         return string.Empty;
+         return String.Empty;
       }
 
       //#if AUDIT_PROP_INFO
@@ -373,10 +385,10 @@ namespace SharedForms.Common.Utils
       {
          if (value is string s)
          {
-            return s.IsEmpty() ? string.Empty : s;
+            return s.IsEmpty<char>() ? String.Empty : s;
          }
 
-         return value == null ? string.Empty : value.ToString();
+         return value == null ? String.Empty : value.ToString();
       }
 
       public static bool HasNoValue(this double? db)
@@ -419,6 +431,135 @@ namespace SharedForms.Common.Utils
          return (int) Math.Round(d, 0);
       }
 
+      public static bool IsEmpty<T>(this IEnumerable<T> list)
+      {
+         return list == null || !list.Any();
+      }
+
+      public static bool IsNotEmpty<T>(this IEnumerable<T> list)
+      {
+         return !list.IsEmpty();
+      }
+
+      public static bool IsAnEqualObjectTo(this object mainObj, object compareObj)
+      {
+         return
+            mainObj == null && compareObj == null
+            ||
+            mainObj != null && mainObj.Equals(compareObj)
+            ||
+            compareObj != null && compareObj.Equals(mainObj);
+      }
+
+      public static bool IsAnEqualReferenceTo<T>(this T mainObj, T compareObj)
+         where T : class
+      {
+         return
+            mainObj == null && compareObj == null
+            ||
+            mainObj == null == (compareObj == null)
+            && ReferenceEquals(compareObj, mainObj);
+      }
+
+      public static bool IsDifferentThan(this double mainD, double otherD)
+      {
+         return !mainD.IsSameAs(otherD);
+      }
+
+      public static bool IsDifferentThan(this float mainF, float otherF)
+      {
+         return !mainF.IsSameAs(otherF);
+      }
+
+      public static bool IsDifferentThan(this string mainStr, string otherStr)
+      {
+         return !mainStr.IsSameAs(otherStr);
+      }
+
+      public static bool IsEmpty(this double mainD)
+      {
+         return mainD.IsSameAs(0);
+      }
+
+      public static bool IsEmpty(this string str)
+      {
+         return String.IsNullOrWhiteSpace(str);
+      }
+
+      //public static bool IsEmpty<T>(this IEnumerable<T> list)
+      //{
+      //   return list == null || !list.Any();
+      //}
+
+      public static bool IsGreaterThanOrEqualTo(this double thisD, double otherD)
+      {
+         return thisD.IsSameAs(otherD) || thisD > otherD;
+      }
+
+      public static bool IsLessThanOrEqualTo(this double thisD, double otherD)
+      {
+         return thisD.IsSameAs(otherD) || thisD < otherD;
+      }
+
+      public static bool IsNotAnEqualObjectTo(this object mainObj, object compareObj)
+      {
+         return !mainObj.IsAnEqualObjectTo(compareObj);
+      }
+
+      public static bool IsNotAnEqualReferenceTo<T>(this T mainObj, T compareObj)
+         where T : class
+      {
+         return !mainObj.IsAnEqualReferenceTo(compareObj);
+      }
+
+      public static bool IsNotEmpty(this double mainD)
+      {
+         return !mainD.IsEmpty();
+      }
+
+      public static bool IsNotEmpty(this string str)
+      {
+         return !str.IsEmpty();
+      }
+
+      //public static bool IsNotEmpty<T>(this IEnumerable<T> list)
+      //{
+      //   return !list.IsEmpty();
+      //}
+
+      public static bool IsNotTheSame(this bool? first, bool? second)
+      {
+         return first == null != (second == null)
+                ||
+                first.IsNotAnEqualObjectTo(second);
+      }
+
+      public static bool IsSameAs(this double mainD, double otherD)
+      {
+         return Math.Abs(mainD - otherD) < NUMERIC_ERROR;
+      }
+
+      public static bool IsSameAs(this float mainF, float otherF)
+      {
+         return Math.Abs(mainF - otherF) < NUMERIC_ERROR;
+      }
+
+      public static bool IsSameAs(this string mainStr, string otherStr)
+      {
+         return String.Compare(mainStr, otherStr, StringComparison.CurrentCultureIgnoreCase) == 0;
+      }
+
+      public static bool IsTrue(this bool? b)
+      {
+         return b.HasValue && b.Value;
+      }
+
+      public static int RoundToInt(this double floatVal)
+      {
+         return (int)Math.Round(floatVal, 0);
+      }
+
+
       /// <summary>
       /// Returns the value for a key, if that key exists in the dictionary.
       /// </summary>
@@ -430,7 +571,7 @@ namespace SharedForms.Common.Utils
             return dict[key];
          }
 
-         return string.Empty;
+         return String.Empty;
       }
 
       #endregion Public Methods

@@ -1,11 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:local="clr-namespace:SafeDI"
-             x:Class="SafeDI.MainPage">
+<lifecycleAware:ContentPageWithLifecycle 
+   xmlns="http://xamarin.com/schemas/2014/forms"
+   xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+   xmlns:local="clr-namespace:SafeDI"
+   xmlns:lifecycleAware="clr-namespace:LifecycleAware;assembly=LifecycleAware"
+   x:Class="SafeDI.Forms.MainPage"
+>
 
-	<Label Text="Welcome to Xamarin.Forms!" 
-           VerticalOptions="Center" 
-           HorizontalOptions="Center" />
+   <ContentPresenter 
+      x:Name="PageContentPresenter"
+   />
 
-</ContentPage>
+</lifecycleAware:ContentPageWithLifecycle>

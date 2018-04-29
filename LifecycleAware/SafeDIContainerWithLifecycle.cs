@@ -24,10 +24,30 @@
 // SOFTWARE.
 #endregion
 
-namespace SafeDI.Lib
+namespace LifecycleAware
 {
-   public interface IReportOrMonitorPageLifecycle 
+   using SafeDI.Lib;
+   using SharedForms.Common.Utils;
+
+   public interface ISafeDIContainerWithLifecycle : ISafeDIContainer
    {
-      
+   }
+
+   /// <summary>
+   /// This container is currently intended to be used for the full life of an app.
+   /// Hence we do not unsubscribe from the messaging center.
+   /// </summary>
+   public class SafeDIContainerWithLifecycle : SafeDIContainer
+   {
+      public SafeDIContainerWithLifecycle()
+      {
+         FormsMessengerUtils.Subscribe<ViewOrPageDisappearingMessage>(this, OnViewOrPageDisappearing);
+      }
+
+      private void OnViewOrPageDisappearing(object sender, ViewOrPageDisappearingMessage args)
+      {
+         // Notify the base container of the change.
+         ContainerClassIsDying(args.Payload);
+      }
    }
 }

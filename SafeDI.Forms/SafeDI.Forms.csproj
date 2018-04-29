@@ -9,6 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\LifecycleAware\LifecycleAware.csproj" />
     <ProjectReference Include="..\SharedForms\SharedForms.csproj" />
   </ItemGroup>
 

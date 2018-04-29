@@ -47,7 +47,7 @@ namespace SafeDI.Lib
       GlobalSingleton
    }
 
-   public interface ISafeDI
+   public interface ISafeDIContainer
    {
       bool ThrowOnMultipleResolutions { get; set; }
       bool ThrowOnStorageRuleCoercion { get; set; }
@@ -64,56 +64,13 @@ namespace SafeDI.Lib
       void ContainerClassIsDying(object containerClass);
 
       /// <summary>
-      ///    Adds a list of bound instances to a single shared instance.
-      /// </summary>
-      /// <typeparam name="TSharedInstance">The shared instance.</typeparam>
-      /// <param name="sharedInstance">The parent instance.</param>
-      /// <param name="instances">The bound instances.</param>
-      void CreateSharedInstances<TSharedInstance>(TSharedInstance sharedInstance,
-         params object[] instances);
-
-      /// <summary>
-      ///    Adds a key-value pair with a class type and an instance of that class.
-      /// </summary>
-      /// <typeparam name="ClassT">The class type.</typeparam>
-      /// <param name="instance">The instance of the type.</param>
-      void CreateSingletonInstance<ClassT>(ClassT instance);
-
-      /// <summary>
       ///    Adds a list of types that the type can be resolved as. Includes creators and storage rules.
       /// </summary>
-      /// <typeparam name="ClassT">The class type that owns the contracts.</typeparam>
+      /// <param name="classT">The class type that owns the contracts.</param>
       /// <param name="creatorsAndRules">
       ///    The list of class creators and rules. The creators can be null.
       /// </param>
-      void RegisterTypeContracts<ClassT>(IDictionary<Type, IProvideCreatorAndStorageRule> creatorsAndRules);
-
-      /// <summary>
-      ///    Removes a bound instance from all shared instances. Also cleans up any orphaned shared instances.
-      /// </summary>
-      /// <param name="obj"></param>
-      void RemoveBoundSharedDependencies(object obj);
-
-      /// <summary>
-      ///    If the type exists as a shared instance, removes it. Only used if this shared instance is
-      ///    about to go out of view.
-      /// </summary>
-      /// <param name="obj"></param>
-      void RemoveSharedInstance<ObjectT>(ObjectT obj);
-
-      /// <summary>
-      ///    Removes a global instance as long as it is the same type and reference.
-      /// </summary>
-      /// <param name="obj"></param>
-      void RemoveSingletonInstance<ObjectT>(ObjectT obj);
-
-      TypeRequestedT Resolve<TypeRequestedT>
-      (
-         StorageRules ruleRequested = StorageRules.AnyAccessLevel,
-         object boundInstance = null,
-         Func<IEnumerable<IProvideCreatorAndStorageRule>, IProvideCreatorAndStorageRule> multipleContractSelecter = null
-      )
-         where TypeRequestedT : class;
+      void RegisterTypeContracts(Type classT, IDictionary<Type, IProvideCreatorAndStorageRule> creatorsAndRules);
 
       object Resolve
       (
@@ -132,36 +89,8 @@ namespace SafeDI.Lib
       void UnregisterTypeContracts<TParent>(params Type[] typesToUnregister);
    }
 
-   public class SafeDI : ISafeDI
+   public class SafeDIContainer : ISafeDIContainer
    {
-      #region Protected Methods
-
-      protected virtual bool CanManageRegisteredTypeContracts<TParent>(bool addThem,
-         IDictionary<Type, IProvideCreatorAndStorageRule> typesAndRules)
-      {
-         if (typesAndRules.IsEmpty())
-         {
-            return false;
-         }
-
-         if (addThem)
-         {
-            foreach (var type in typesAndRules.Keys)
-            {
-               if (!typeof(TParent).IsMainTypeOrAssignableFromMainType(type))
-               {
-                  throw new ArgumentException("SafeDI: CanManageRegisteredTypeContracts: cannot resolve " +
-                                              typeof(TParent) + " to " +
-                                              type + " because they have no class or interface relationship.");
-               }
-            }
-         }
-
-         return true;
-      }
-
-      #endregion Protected Methods
-
       #region Protected Variables
 
       /// <summary>
@@ -224,183 +153,32 @@ namespace SafeDI.Lib
       }
 
       /// <summary>
-      ///    Adds a list of bound instances to a single shared instance.
-      /// </summary>
-      /// <typeparam name="TSharedInstance">The shared instance.</typeparam>
-      /// <param name="sharedInstance">The parent instance.</param>
-      /// <param name="instances">The bound instances.</param>
-      public void CreateSharedInstances<TSharedInstance>(TSharedInstance sharedInstance,
-         params object[] instances)
-      {
-         // Use the same type checker that we apply to the type dependency case. These are instances
-         // of *types*
-         var instanceTypes = instances.Select(i => i.GetType()).ToArray();
-
-         var illegalTypes = instanceTypes.Where(t => t.IsMainTypeOrAssignableFromMainType(typeof(TSharedInstance)))
-            .ToList();
-
-         if (illegalTypes.IsNotEmpty())
-         {
-            // Report the first error.
-            throw new ArgumentException("SafeDI: ManageSharedInstances: cannot share " + illegalTypes[0] +
-                                        " with itself, even if derived.");
-         }
-
-         // Verify that the instance types are *not* directly assignable from the shared instance, as
-         // that is circular.
-         foreach (var type in instanceTypes)
-         {
-            if (type.IsMainTypeOrAssignableFromMainType(typeof(TSharedInstance)))
-            {
-               throw new ArgumentException("SafeDI: ManageSharedInstances: " + type +
-                                           " is an illegal circular reference back to the parent " +
-                                           typeof(TSharedInstance));
-            }
-         }
-
-         var boundInstances = _sharedInstancesWithBoundMembers[sharedInstance];
-
-         if (boundInstances == null)
-         {
-            boundInstances = new List<object>();
-            _sharedInstancesWithBoundMembers.Add(sharedInstance, boundInstances);
-            return;
-         }
-
-         foreach (var instance in instances)
-         {
-            if (!boundInstances.Contains(instance))
-            {
-               boundInstances.Add(instance);
-            }
-         }
-      }
-
-      /// <summary>
-      ///    Adds a key-value pair with a class type and an instance of that class.
-      /// </summary>
-      /// <typeparam name="ClassT">The class type.</typeparam>
-      /// <param name="instance">The instance of the type.</param>
-      public void CreateSingletonInstance<ClassT>(ClassT instance)
-      {
-         if (_globalSingletons[typeof(ClassT)] != null)
-         {
-            Debug.WriteLine("SafeDI: CreateSingletonInstance: Over-writing an existing singleton of type " +
-                            _globalSingletons[typeof(ClassT)].GetType());
-         }
-
-         _globalSingletons[typeof(ClassT)] = instance;
-      }
-
-      /// <summary>
       ///    Adds a list of types that the type can be resolved as. Includes creators and storage rules.
       /// </summary>
-      /// <typeparam name="ClassT">The class type that owns the contracts.</typeparam>
       /// <param name="creatorsAndRules">
       ///    The list of class creators and rules. The creators can be null.
       /// </param>
-      public void RegisterTypeContracts<ClassT>(IDictionary<Type, IProvideCreatorAndStorageRule> creatorsAndRules)
+      /// <param name="classT">The base type for the class rule.</param>
+      public void RegisterTypeContracts(Type classT, IDictionary<Type, IProvideCreatorAndStorageRule> creatorsAndRules)
       {
-         if (_registeredTypeContracts[typeof(ClassT)] == null)
+         // ClassT must be a standard public type -- otherwise, can't be instantiated
+         if (!classT.IsPublic || !classT.IsClass || classT.IsGenericType || classT.IsSealed || classT.IsAbstract || classT.IsInterface)
          {
-            _registeredTypeContracts[typeof(ClassT)] = creatorsAndRules;
+            throw new ArgumentException("SafeDIContainer: RegisterTypeContracts: Type " + classT + " is must be a standard public type");
+         }
+
+         if (_registeredTypeContracts[classT] == null)
+         {
+            _registeredTypeContracts[classT] = creatorsAndRules;
          }
          else
          {
             // Augment whatever is there
             foreach (var keyValuePair in creatorsAndRules)
             {
-               _registeredTypeContracts[typeof(ClassT)].Add(keyValuePair);
+               _registeredTypeContracts[classT].Add(keyValuePair);
             }
          }
-      }
-
-      /// <summary>
-      ///    Removes a bound instance from all shared instances. Also cleans up any orphaned shared instances.
-      /// </summary>
-      /// <param name="obj"></param>
-      public void RemoveBoundSharedDependencies(object obj)
-      {
-         if (_sharedInstancesWithBoundMembers.IsEmpty())
-         {
-            return;
-         }
-
-         var sharedInstancesToDelete = new List<object>();
-
-         foreach (var sharedInstance in _sharedInstancesWithBoundMembers)
-         {
-            var foundBoundMembers = sharedInstance.Value.Where(si => ReferenceEquals(si, obj)).ToArray();
-
-            if (!foundBoundMembers.Any())
-            {
-               continue;
-            }
-
-            foreach (var foundBoundMember in foundBoundMembers)
-            {
-               sharedInstance.Value.Remove(foundBoundMember);
-            }
-
-            // If no children, remove the shared instance itself.
-            if (!sharedInstance.Value.Any())
-            {
-               sharedInstancesToDelete.Add(sharedInstance);
-            }
-         }
-
-         // Remove the shared instances that are now orphaned
-         foreach (var sharedInstance in sharedInstancesToDelete)
-         {
-            _sharedInstancesWithBoundMembers.Remove(sharedInstance);
-         }
-      }
-
-      /// <summary>
-      ///    If the type exists as a shared instance, removes it. Only used if this shared instance is
-      ///    about to go out of view.
-      /// </summary>
-      /// <param name="obj"></param>
-      public void RemoveSharedInstance<ObjectT>(ObjectT obj)
-      {
-         var objectType = typeof(ObjectT);
-
-         if (_sharedInstancesWithBoundMembers.ContainsKey(objectType) &&
-             ReferenceEquals(_sharedInstancesWithBoundMembers[objectType], obj))
-         {
-            _sharedInstancesWithBoundMembers.Remove(objectType);
-         }
-      }
-
-      /// <summary>
-      ///    Removes a global instance as long as it is the same type and reference.
-      /// </summary>
-      /// <param name="obj"></param>
-      public void RemoveSingletonInstance<ObjectT>(ObjectT obj)
-      {
-         var objectType = typeof(ObjectT);
-
-         if (_globalSingletons.ContainsKey(objectType) && ReferenceEquals(_globalSingletons[objectType], obj))
-         {
-            _globalSingletons.Remove(objectType);
-         }
-      }
-
-      public TypeRequestedT Resolve<TypeRequestedT>
-      (
-         StorageRules ruleRequested = StorageRules.AnyAccessLevel,
-         object boundInstance = null,
-         Func<IEnumerable<IProvideCreatorAndStorageRule>, IProvideCreatorAndStorageRule> multipleContractSelecter = null
-      )
-         where TypeRequestedT : class
-      {
-         return Resolve
-         (
-            typeof(TypeRequestedT),
-            ruleRequested,
-            boundInstance,
-            multipleContractSelecter = null
-         ) as TypeRequestedT;
       }
 
       public object Resolve
@@ -417,7 +195,7 @@ namespace SafeDI.Lib
          if (boundInstance == null && ruleRequested == StorageRules.SharedDependencyBetweenInstances)
          {
             throw new ArgumentException(
-               "SafeDI : Resolve: Cannot resolve a shared or dependent type without a bound type to have it rely on.");
+               "SafeDIContainer : Resolve: Cannot resolve a shared or dependent type without a bound type to have it rely on.");
          }
 
          // Look for a contract for this type. The value we seek is in the IProvideCreatorAndStorageRule.
@@ -434,7 +212,7 @@ namespace SafeDI.Lib
          {
             if (ThrowWhenMoreThanOneMasterContractType)
             {
-               throw new ArgumentException("SafeDI : Resolve: Too many contracts (" +
+               throw new ArgumentException("SafeDIContainer : Resolve: Too many contracts (" +
                                            qualifyingTypeContracts.Count() +
                                            ") for the resolvable type " + typeRequestedT);
             }
@@ -458,7 +236,7 @@ namespace SafeDI.Lib
             {
                if (ThrowOnStorageRuleCoercion)
                {
-                  throw new ArgumentException("SafeDI : Resolve: Cannot find a registration for the type " +
+                  throw new ArgumentException("SafeDIContainer : Resolve: Cannot find a registration for the type " +
                                               typeRequestedT +
                                               " using storage rule " + ruleRequested);
                }
@@ -473,7 +251,7 @@ namespace SafeDI.Lib
 
          if (!qualifyingRegistrations.Any())
          {
-            throw new ArgumentException("SafeDI : Resolve: Cannot find a registration for the type " +
+            throw new ArgumentException("SafeDIContainer : Resolve: Cannot find a registration for the type " +
                                         typeRequestedT);
          }
 
@@ -494,7 +272,7 @@ namespace SafeDI.Lib
                {
                   if (ThrowOnMultipleResolutions)
                   {
-                     throw new InvalidOperationException("SafeDI : Resolve: Cannot determine which one of " +
+                     throw new InvalidOperationException("SafeDIContainer : Resolve: Cannot determine which one of " +
                                                          qualifyingRegistrations.Count() +
                                                          " registrations to use through the conflict resolver.");
                   }
@@ -504,7 +282,7 @@ namespace SafeDI.Lib
             }
             else if (ThrowOnMultipleResolutions)
             {
-               throw new InvalidOperationException("SafeDI : Resolve: Cannot determine which one of " +
+               throw new InvalidOperationException("SafeDIContainer : Resolve: Cannot determine which one of " +
                                                    qualifyingRegistrations.Count() +
                                                    " registrations to use.  Please add a conflict resolver or change the registrations.");
             }
@@ -518,14 +296,14 @@ namespace SafeDI.Lib
          // The same as having no qualifying registrations
          if (resolutionToSeek == null)
          {
-            throw new ArgumentException("SafeDI : Resolve: Cannot find a registration for the type " +
+            throw new ArgumentException("SafeDIContainer : Resolve: Cannot find a registration for the type " +
                                         typeRequestedT);
          }
 
          // Verify that the result will be legal, since we will cast as TypeRequestedT
          if (!qualifyingMasterType.IsMainTypeOrAssignableFromMainType(typeRequestedT))
          {
-            throw new InvalidOperationException("SafeDI : Resolve: Cannot save an instance of " +
+            throw new InvalidOperationException("SafeDIContainer : Resolve: Cannot save an instance of " +
                                                 qualifyingMasterType + " as " + typeRequestedT);
          }
 
@@ -582,7 +360,7 @@ namespace SafeDI.Lib
                if (returnT == null)
                {
                   throw new InvalidOperationException(
-                     "SafeDI : Resolve: Failed to share a found instance of type " +
+                     "SafeDIContainer : Resolve: Failed to share a found instance of type " +
                      typeRequestedT + ".  UNKNOWN ERROR.");
                }
 
@@ -603,7 +381,7 @@ namespace SafeDI.Lib
             if (instantiatedObject == null)
             {
                throw new InvalidOperationException(
-                  "SafeDI : Resolve: Could not create an object using the provided constructor.");
+                  "SafeDIContainer : Resolve: Could not create an object using the provided constructor.");
             }
 
             // ELSE the instated object is valid. Proceed as if we had created the object using
@@ -621,7 +399,7 @@ namespace SafeDI.Lib
             if (availableConstructors.IsEmpty())
             {
                throw new InvalidOperationException(
-                  "SafeDI : Resolve: Could not find a valid constructor for type requested: " +
+                  "SafeDIContainer : Resolve: Could not find a valid constructor for type requested: " +
                   qualifyingMasterType);
             }
 
@@ -649,7 +427,7 @@ namespace SafeDI.Lib
                   catch (Exception)
                   {
                      // If we threw, then this constructor will not work
-                     Debug.WriteLine("SafeDI: Resolve: Exception on attempt to instantiate " +
+                     Debug.WriteLine("SafeDIContainer: Resolve: Exception on attempt to instantiate " +
                                      qualifyingMasterType +
                                      " using one of its constructors. Will try another constructor...");
                      goto SKIP_THIS_ONE;
@@ -668,7 +446,7 @@ namespace SafeDI.Lib
                //}
                //else
                //{
-               //   Debug.WriteLine("SafeDI: Resolve: Constructed wrong type: " + instantiatedType + " when I wanted " + qualifyingMasterType);
+               //   Debug.WriteLine("SafeDIContainer: Resolve: Constructed wrong type: " + instantiatedType + " when I wanted " + qualifyingMasterType);
                //}
 
                SKIP_THIS_ONE:;
@@ -677,8 +455,9 @@ namespace SafeDI.Lib
 
          if (instantiatedObject == null)
          {
-            throw new InvalidOperationException("SafeDI : Resolve: Could not construct an object for base type " +
-                                                qualifyingMasterType);
+            throw new InvalidOperationException(
+               "SafeDIContainer : Resolve: Could not construct an object for base type " +
+               qualifyingMasterType);
          }
 
          // Now we have an instantiated object. Determine its storage before delivering it.
@@ -686,8 +465,9 @@ namespace SafeDI.Lib
 
          if (returnT == null)
          {
-            throw new InvalidOperationException("SafeDI : Resolve: Failed to type-cast my constructed object " +
-                                                instantiatedObject.GetType() + " as " + typeRequestedT);
+            throw new InvalidOperationException(
+               "SafeDIContainer : Resolve: Failed to type-cast my constructed object " +
+               instantiatedObject.GetType() + " as " + typeRequestedT);
          }
 
          // The last step is to determine if we have to save the new object in our container.
@@ -742,5 +522,175 @@ namespace SafeDI.Lib
       }
 
       #endregion Public Methods
+
+      #region Protected Methods
+
+      protected virtual bool CanManageRegisteredTypeContracts<TParent>(bool addThem,
+         IDictionary<Type, IProvideCreatorAndStorageRule> typesAndRules)
+      {
+         if (typesAndRules.IsEmpty())
+         {
+            return false;
+         }
+
+         if (addThem)
+         {
+            foreach (var type in typesAndRules.Keys)
+            {
+               if (!typeof(TParent).IsMainTypeOrAssignableFromMainType(type))
+               {
+                  throw new ArgumentException("SafeDIContainer: CanManageRegisteredTypeContracts: cannot resolve " +
+                                              typeof(TParent) + " to " +
+                                              type + " because they have no class or interface relationship.");
+               }
+            }
+         }
+
+         return true;
+      }
+
+      /// <summary>
+      ///    Adds a list of bound instances to a single shared instance.
+      /// </summary>
+      /// <typeparam name="TSharedInstance">The shared instance.</typeparam>
+      /// <param name="sharedInstance">The parent instance.</param>
+      /// <param name="instances">The bound instances.</param>
+      protected void CreateSharedInstances<TSharedInstance>(TSharedInstance sharedInstance,
+         params object[] instances)
+      {
+         // Use the same type checker that we apply to the type dependency case. These are instances
+         // of *types*
+         var instanceTypes = instances.Select(i => i.GetType()).ToArray();
+
+         var illegalTypes = instanceTypes.Where(t => t.IsMainTypeOrAssignableFromMainType(typeof(TSharedInstance)))
+            .ToList();
+
+         if (illegalTypes.IsNotEmpty())
+         {
+            // Report the first error.
+            throw new ArgumentException("SafeDIContainer: ManageSharedInstances: cannot share " + illegalTypes[0] +
+                                        " with itself, even if derived.");
+         }
+
+         // Verify that the instance types are *not* directly assignable from the shared instance, as
+         // that is circular.
+         foreach (var type in instanceTypes)
+         {
+            if (type.IsMainTypeOrAssignableFromMainType(typeof(TSharedInstance)))
+            {
+               throw new ArgumentException("SafeDIContainer: ManageSharedInstances: " + type +
+                                           " is an illegal circular reference back to the parent " +
+                                           typeof(TSharedInstance));
+            }
+         }
+
+         var boundInstances = _sharedInstancesWithBoundMembers[sharedInstance];
+
+         if (boundInstances == null)
+         {
+            boundInstances = new List<object>();
+            _sharedInstancesWithBoundMembers.Add(sharedInstance, boundInstances);
+            return;
+         }
+
+         foreach (var instance in instances)
+         {
+            if (!boundInstances.Contains(instance))
+            {
+               boundInstances.Add(instance);
+            }
+         }
+      }
+
+      /// <summary>
+      ///    Adds a key-value pair with a class type and an instance of that class.
+      /// </summary>
+      /// <typeparam name="ClassT">The class type.</typeparam>
+      /// <param name="instance">The instance of the type.</param>
+      protected void CreateSingletonInstance<ClassT>(ClassT instance)
+      {
+         _globalSingletons[typeof(ClassT)] = instance;
+      }
+
+      /// <summary>
+      ///    Removes a bound instance from all shared instances. Also cleans up any orphaned shared instances.
+      /// </summary>
+      /// <param name="obj"></param>
+      protected void RemoveBoundSharedDependencies(object obj)
+      {
+         if (_sharedInstancesWithBoundMembers.IsEmpty())
+         {
+            return;
+         }
+
+         var sharedInstancesToDelete = new List<object>();
+
+         foreach (var sharedInstance in _sharedInstancesWithBoundMembers)
+         {
+            var foundBoundMembers = sharedInstance.Value.Where(si => ReferenceEquals(si, obj)).ToArray();
+
+            if (!foundBoundMembers.Any())
+            {
+               continue;
+            }
+
+            foreach (var foundBoundMember in foundBoundMembers)
+            {
+               sharedInstance.Value.Remove(foundBoundMember);
+            }
+
+            // If no children, remove the shared instance itself.
+            if (!sharedInstance.Value.Any())
+            {
+               sharedInstancesToDelete.Add(sharedInstance);
+            }
+         }
+
+         // Remove the shared instances that are now orphaned
+         foreach (var sharedInstance in sharedInstancesToDelete)
+         {
+            _sharedInstancesWithBoundMembers.Remove(sharedInstance);
+         }
+      }
+
+      /// <summary>
+      ///    If the type exists as a shared instance, removes it. Only used if this shared instance is
+      ///    about to go out of view.
+      /// </summary>
+      /// <param name="obj"></param>
+      protected void RemoveSharedInstance<ObjectT>(ObjectT obj)
+      {
+         var objectType = typeof(ObjectT);
+
+         // Seek these by reference, since we have a valid object.
+         // It's safer considering that any instantiated type can be returned as any implemented interface.
+         // So the type could easily mis-match.
+         var foundSharedInstance = _sharedInstancesWithBoundMembers.FirstOrDefault(si => ReferenceEquals(si.Key, obj));
+
+         if (foundSharedInstance.IsNotAnEqualObjectTo(default(IDictionary<object, IList<object>>)))
+         {
+            _sharedInstancesWithBoundMembers.Remove(foundSharedInstance.Key);
+         }
+      }
+
+      /// <summary>
+      ///    Removes a global instance as long as it is the same type and reference.
+      /// </summary>
+      /// <param name="obj"></param>
+      protected void RemoveSingletonInstance<ObjectT>(ObjectT obj)
+      {
+         var objectType = typeof(ObjectT);
+
+         // Find the singleton based on the reference and *not* by the type,
+         // as any interface type might be declared, but the constructor could easily hand us a base type.
+         var foundSingleton = _globalSingletons.FirstOrDefault(s => ReferenceEquals(s.Value, obj));
+
+         if (foundSingleton.IsNotAnEqualObjectTo(default(IDictionary<Type,object>)))
+         {
+            _globalSingletons.Remove(foundSingleton.Key);
+         }
+      }
+
+      #endregion Protected Methods
    }
 }

@@ -24,10 +24,16 @@
 // SOFTWARE.
 #endregion
 
-namespace SafeDI.Lib
+namespace LifecycleAware
 {
-   public interface IMonitorPageLifecycle : IReportOrMonitorPageLifecycle
+   using SharedForms.Common.Utils;
+   using Xamarin.Forms;
+
+   public static class LifecycleAwareUtils
    {
-      IReportPageLifecycle OriginatingPage { get; set; }
+      public static void SendViewOrPageDisappearingMessage(this VisualElement view)
+      {
+         FormsMessengerUtils.Send(new ViewOrPageDisappearingMessage {Payload = view});
+      }
    }
 }

@@ -24,36 +24,10 @@
 // SOFTWARE.
 #endregion
 
-namespace SafeDI.Lib
+namespace LifecycleAware
 {
-   using System;
-   using SharedForms.Common.Utils;
-   using Xamarin.Forms;
-
-   /// <remarks>
-   /// WARNING: .Net does not provide IContentpage, so references to this interface type *must* type-cast to ContentPage_LCA manually.
-   /// </remarks>
-   public interface IContentPageWithLifecycle : IReportPageLifecycle
+   public interface IReportOrMonitorPageLifecycle 
    {
-   }
-
-   public class ContentPageWithLifecycle : ContentPage, IContentPageWithLifecycle
-   {
-      protected override void OnAppearing()
-      {
-         base.OnAppearing();
-
-         PageIsAppearing?.Invoke(this);
-      }
-
-      protected override void OnDisappearing()
-      {
-         base.OnDisappearing();
-
-         PageIsDisappearing?.Invoke(this);
-      }
-
-      public event EventUtils.GenericDelegate<ContentPage> PageIsAppearing;
-      public event EventUtils.GenericDelegate<ContentPage> PageIsDisappearing;
+      
    }
 }

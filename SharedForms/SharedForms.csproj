@@ -20,4 +20,8 @@
     <PackageReference Include="Xamarin.Forms.Plugin.CustomToggleButton" Version="1.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SharedUtils\SharedUtils.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using Xamarin.Forms;
-
-namespace SafeDI
+﻿namespace SafeDI.Forms
 {
+	using Xamarin.Forms;
+
 	public partial class App : Application
 	{
 		public App ()
 		{
 			InitializeComponent();
 
-			MainPage = new SafeDI.MainPage();
+			MainPage = new MainPage();
 		}
 
 		protected override void OnStart ()

@@ -24,9 +24,8 @@
 // SOFTWARE.
 #endregion
 
-namespace SafeDI.Lib
+namespace LifecycleAware
 {
-   using System;
    using SharedForms.Common.Utils;
    using Xamarin.Forms;
 
