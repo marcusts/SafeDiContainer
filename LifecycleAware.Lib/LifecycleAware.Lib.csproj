@@ -5,9 +5,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SafeDI.Lib\SafeDI.Lib.csproj" />
+    <PackageReference Include="Acr.UserDialogs" Version="7.0.1" />
+    <PackageReference Include="Fody" Version="3.0.3" />
+    <PackageReference Include="PropertyChanged.Fody" Version="2.5.4" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\SharedForms\SharedForms.csproj" />
     <ProjectReference Include="..\SharedUtils\SharedUtils.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="NETStandard.Library" Version="2.0.2" />
   </ItemGroup>
 
 </Project>

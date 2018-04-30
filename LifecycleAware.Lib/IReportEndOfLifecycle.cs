@@ -24,11 +24,9 @@
 // SOFTWARE.
 #endregion
 
-namespace LifecycleAware
+namespace LifecycleAware.Lib
 {
-   using System;
    using SharedForms.Common.Utils;
-   using Xamarin.Forms;
 
    public interface IReportEndOfLifecycle
    {

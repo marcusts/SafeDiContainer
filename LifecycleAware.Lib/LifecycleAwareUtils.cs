@@ -24,14 +24,13 @@
 // SOFTWARE.
 #endregion
 
-namespace LifecycleAware
+namespace LifecycleAware.Lib
 {
    using SharedForms.Common.Utils;
-   using Xamarin.Forms;
 
    public static class LifecycleAwareUtils
    {
-      public static void SendViewOrPageDisappearingMessage(this object obj)
+      public static void SendObjectDisappearingMessage(this object obj)
       {
          FormsMessengerUtils.Send(new ObjectDisappearingMessage {Payload = obj});
       }

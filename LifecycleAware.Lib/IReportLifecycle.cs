@@ -24,12 +24,11 @@
 // SOFTWARE.
 #endregion
 
-namespace LifecycleAware
+namespace LifecycleAware.Lib
 {
    using SharedForms.Common.Utils;
-   using Xamarin.Forms;
 
-   public interface IReportLifecycle : IReportOrMonitorPageLifecycle, IReportEndOfLifecycle
+   public interface IReportLifecycle : IReportEndOfLifecycle
    {
       event EventUtils.GenericDelegate<object> IsAppearing;
    }

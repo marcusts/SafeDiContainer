@@ -1,5 +1,4 @@
 ﻿#region License
-
 // MIT License
 // 
 // Copyright (c) 2018 
@@ -23,27 +22,36 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-
 #endregion
 
-namespace SharedIOS
+namespace LifecycleAware.Forms
 {
-   #region Imports
+   using System.Diagnostics;
+   using PropertyChanged;
+   using SharedForms.Common.Utils;
 
-   using CoreGraphics;
-   using Xamarin.Forms;
-
-   #endregion
-
-   public static class PointExtensions
+   public interface IMainViewModel
    {
-      #region Public Methods
+   }
 
-      public static CGPoint ToCGPoint(this Point point)
+   [AddINotifyPropertyChangedInterface]
+   public class FirstViewModel : IMainViewModel
+   {
+      public FirstViewModel()
       {
-         return new CGPoint(point.X, point.Y);
+         Debug.WriteLine("The First View Model is being created.");
+
+         FormsMessengerUtils.Subscribe<TestPingMessage>(this, OnTestPing);
       }
 
-      #endregion Public Methods
+      private static void OnTestPing(object arg1, TestPingMessage arg2)
+      {
+         Debug.WriteLine("The First View Model is still listening to events!");
+      }
+
+      ~FirstViewModel()
+      {
+         Debug.WriteLine("The First View Model is being FINALIZED.");
+      }
    }
 }

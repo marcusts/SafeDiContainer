@@ -26,7 +26,7 @@
 
 #endregion
 
-namespace LifecycleAware
+namespace LifecycleAware.Lib
 {
    #region Imports
 
@@ -76,7 +76,7 @@ namespace LifecycleAware
 
          IsDisappearing?.Invoke(this);
 
-         this.SendViewOrPageDisappearingMessage();
+         this.SendObjectDisappearingMessage();
       }
 
       #endregion Protected Methods

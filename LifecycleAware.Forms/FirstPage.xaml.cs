@@ -26,24 +26,23 @@
 
 #endregion
 
-namespace SharedIOS
+namespace LifecycleAware.Forms
 {
    #region Imports
 
-   using CoreGraphics;
    using Xamarin.Forms;
 
    #endregion
 
-   public static class PointExtensions
+   public partial class FirstPage : ContentPage
    {
-      #region Public Methods
+      #region Public Constructors
 
-      public static CGPoint ToCGPoint(this Point point)
+      public FirstPage()
       {
-         return new CGPoint(point.X, point.Y);
+         InitializeComponent();
       }
 
-      #endregion Public Methods
+      #endregion Public Constructors
    }
 }

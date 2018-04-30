@@ -26,7 +26,7 @@
 
 #endregion
 
-namespace LifecycleAware
+namespace LifecycleAware.Lib
 {
    #region Imports
 
@@ -37,7 +37,7 @@ namespace LifecycleAware
 
    #endregion
 
-   public interface IContentViewWithLifecycle : IDisposable, IReportEndOfLifecycle
+   public interface IContentViewWithLifecycle : IHostLifecycleReporter, IReportEndOfLifecycle, ICanCleanUp
    {
       #region Public Properties
 
@@ -69,12 +69,6 @@ namespace LifecycleAware
 
       #endregion Public Variables
 
-      #region Private Variables
-
-      private IReportLifecycle _lifecycleReporter;
-
-      #endregion Private Variables
-
       #region Public Constructors
 
       public ContentViewWithLifecycle(IReportLifecycle lifeCycleReporter = null)
@@ -84,27 +78,69 @@ namespace LifecycleAware
 
       #endregion Public Constructors
 
-      #region Protected Properties
-
-      /// <summary>
-      ///    Helpful when a view is about to go out of scope, but the parent page containing it is *not*
-      ///    disappearing. The programmer should call Dispose() on this view in that single case. Also,
-      ///    if any processes are running, and IsDisposing is true, stop those processes *immediately*.
-      ///    The garbage collector is too slow to manage this in a better way for us. Classes are
-      ///    surprisingly active until the are finalized unless they implement IDisposable. Finalization
-      ///    can take a very long time.
-      /// </summary>
-      protected bool IsDisposing { get; set; }
-
-      #endregion Protected Properties
-
       #region Public Events
 
       public event EventUtils.GenericDelegate<object> IsDisappearing;
 
       #endregion Public Events
 
+      #region Public Methods
+
+      public static BindableProperty CreateContentViewWithLifecycleBindableProperty<PropertyTypeT>
+      (
+         string localPropName,
+         PropertyTypeT defaultVal = default(PropertyTypeT),
+         BindingMode bindingMode = BindingMode.OneWay,
+         Action<ContentViewWithLifecycle, PropertyTypeT, PropertyTypeT> callbackAction = null
+      )
+      {
+         return BindableUtils.CreateBindableProperty(localPropName, defaultVal, bindingMode, callbackAction);
+      }
+
+      #endregion Public Methods
+
+      #region Private Destructors
+
+      ~ContentViewWithLifecycle()
+      {
+         if (!IsCleaningUp)
+         {
+            IsCleaningUp = true;
+         }
+      }
+
+      #endregion Private Destructors
+
+      #region Private Variables
+
+      private bool _isCleaningUp;
+
+      private IReportLifecycle _lifecycleReporter;
+
+      #endregion Private Variables
+
       #region Public Properties
+
+      public bool IsCleaningUp
+      {
+         get => _isCleaningUp;
+         set
+         {
+            if (_isCleaningUp != value)
+            {
+               _isCleaningUp = value;
+
+               if (_isCleaningUp)
+               {
+                  // Notifies the safe di container and other concerned foreign members
+                  this.SendObjectDisappearingMessage();
+
+                  // Notifies close relatives like view models
+                  IsDisappearing?.Invoke(this);
+               }
+            }
+         }
+      }
 
       public IReportLifecycle LifecycleReporter
       {
@@ -127,51 +163,11 @@ namespace LifecycleAware
 
       #endregion Public Properties
 
-      #region Private Destructors
-
-      ~ContentViewWithLifecycle()
-      {
-         Dispose(false);
-      }
-
-      #endregion Private Destructors
-
-      #region Public Methods
-
-      public static BindableProperty CreateContentViewWithLifecycleBindableProperty<PropertyTypeT>
-      (
-         string localPropName,
-         PropertyTypeT defaultVal = default(PropertyTypeT),
-         BindingMode bindingMode = BindingMode.OneWay,
-         Action<ContentViewWithLifecycle, PropertyTypeT, PropertyTypeT> callbackAction = null
-      )
-      {
-         return BindableUtils.CreateBindableProperty(localPropName, defaultVal, bindingMode, callbackAction);
-      }
-
-      public void Dispose()
-      {
-         Dispose(true);
-         GC.SuppressFinalize(this);
-      }
-
-      #endregion Public Methods
-
       #region Protected Methods
-
-      protected virtual void Dispose(bool disposing)
-      {
-         IsDisposing = disposing;
-
-         ReleaseUnmanagedResources();
-         if (disposing)
-         {
-         }
-      }
 
       protected virtual void OnDisappearing(object val)
       {
-         Dispose();
+         IsCleaningUp = true;
       }
 
       protected virtual void OnPageAppearing(ContentPage page)
@@ -180,11 +176,6 @@ namespace LifecycleAware
 
       protected virtual void ReleaseUnmanagedResources()
       {
-         // Notifies the safe di container and other concerned foreign members
-         this.SendViewOrPageDisappearingMessage();
-
-         // Notifies close relatives like view models
-         IsDisappearing?.Invoke(this);
       }
 
       #endregion Protected Methods

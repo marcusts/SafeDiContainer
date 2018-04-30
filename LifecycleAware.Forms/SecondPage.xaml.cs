@@ -26,49 +26,24 @@
 
 #endregion
 
-namespace LifecycleAware
+namespace LifecycleAware.Forms
 {
    #region Imports
 
-   using SafeDI.Lib;
-   using SharedForms.Common.Utils;
+   using Xamarin.Forms;
 
    #endregion
 
-   public interface ISafeDIContainerWithLifecycle : ISafeDIContainer
-   {
-   }
-
-   public class SafeDIContainerWithLifecycle : SafeDIContainer, ISafeDIContainerWithLifecycle
+   // [XamlCompilation(XamlCompilationOptions.Compile)]
+   public partial class SecondPage : ContentPage
    {
       #region Public Constructors
 
-      public SafeDIContainerWithLifecycle()
+      public SecondPage()
       {
-         FormsMessengerUtils.Subscribe<ObjectDisappearingMessage>(this, OnViewOrPageDisappearing);
+         InitializeComponent();
       }
 
       #endregion Public Constructors
-
-      #region Protected Methods
-
-      protected override void ReleaseUnmanagedResources()
-      {
-         base.ReleaseUnmanagedResources();
-
-         FormsMessengerUtils.Unsubscribe<ObjectDisappearingMessage>(this);
-      }
-
-      #endregion Protected Methods
-
-      #region Private Methods
-
-      private void OnViewOrPageDisappearing(object sender, ObjectDisappearingMessage args)
-      {
-         // Notify the base container of the change.
-         ContainerClassIsDying(args.Payload);
-      }
-
-      #endregion Private Methods
    }
 }

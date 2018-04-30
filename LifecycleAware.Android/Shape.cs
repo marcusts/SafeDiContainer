@@ -28,7 +28,7 @@
 
 // #define USE_SHADOW
 
-namespace SharedAndroid
+namespace LifecycleAware.Droid
 {
    #region Imports
 
@@ -50,8 +50,13 @@ namespace SharedAndroid
 
       public Shape(float density, Context context, ShapeView shapeView) : base(context)
       {
-         _shapeView = shapeView ?? throw new ArgumentNullException(nameof(shapeView));
+         if (shapeView == null)
+         {
+            throw new ArgumentNullException(nameof(shapeView));
+         }
+
          _density = density;
+         _shapeView = shapeView;
       }
 
 #if USE_SHADOW

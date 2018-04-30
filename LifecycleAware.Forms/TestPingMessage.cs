@@ -1,5 +1,4 @@
 ﻿#region License
-
 // MIT License
 // 
 // Copyright (c) 2018 
@@ -23,27 +22,14 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-
 #endregion
 
-namespace SharedIOS
+namespace LifecycleAware.Forms
 {
-   #region Imports
+   using SharedForms.Common.Navigation;
+   using SharedForms.Common.Utils;
 
-   using CoreGraphics;
-   using Xamarin.Forms;
-
-   #endregion
-
-   public static class PointExtensions
+   public class TestPingMessage : GenericMessageWithPayload<NoPayload>
    {
-      #region Public Methods
-
-      public static CGPoint ToCGPoint(this Point point)
-      {
-         return new CGPoint(point.X, point.Y);
-      }
-
-      #endregion Public Methods
    }
 }

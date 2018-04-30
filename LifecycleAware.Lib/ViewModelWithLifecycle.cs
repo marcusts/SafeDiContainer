@@ -26,27 +26,20 @@
 
 #endregion
 
-namespace LifecycleAware
+namespace LifecycleAware.Lib
 {
    #region Imports
 
-   using System;
    using System.ComponentModel;
    using System.Runtime.CompilerServices;
    using Annotations;
-   using SharedForms.Common.Utils;
    using SharedUtils;
    using Xamarin.Forms;
 
    #endregion
 
-   public interface IViewModelWithLifecycle : IDisposable, INotifyPropertyChanged
+   public interface IViewModelWithLifecycle : INotifyPropertyChanged, IHostLifecycleReporter, ICanCleanUp
    {
-      #region Public Properties
-
-      IReportLifecycle ViewLifecycleReporter { get; set; }
-
-      #endregion Public Properties
    }
 
    /// <summary>
@@ -59,34 +52,14 @@ namespace LifecycleAware
    /// </remarks>
    public class ViewModelWithLifecycle : IViewModelWithLifecycle
    {
-      #region Private Variables
-
-      private IReportLifecycle _parentLifecycleReporter;
-
-      #endregion Private Variables
-
       #region Public Constructors
 
       public ViewModelWithLifecycle(IReportLifecycle lifeCycleReporter = null)
       {
-         ViewLifecycleReporter = lifeCycleReporter;
+         LifecycleReporter = lifeCycleReporter;
       }
 
       #endregion Public Constructors
-
-      #region Protected Properties
-
-      /// <summary>
-      ///    Helpful when a view model is about to go out of scope, but the bound view is *not*
-      ///    disappearing. The programmer should call Dispose() on this view model in that single case. Also,
-      ///    if any processes are running, and IsDisposing is true, stop those processes *immediately*.
-      ///    The garbage collector is too slow to manage this in a better way for us. Classes are
-      ///    surprisingly active until the are finalized unless they implement IDisposable. Finalization
-      ///    can take a very long time.
-      /// </summary>
-      protected bool IsDisposing { get; set; }
-
-      #endregion Protected Properties
 
       #region Public Events
 
@@ -94,21 +67,59 @@ namespace LifecycleAware
 
       #endregion Public Events
 
+      #region Private Destructors
+
+      ~ViewModelWithLifecycle()
+      {
+         if (!IsCleaningUp)
+         {
+            IsCleaningUp = true;
+         }
+      }
+
+      #endregion Private Destructors
+
+      #region Private Variables
+
+      private bool _isCleaningUp;
+
+      private IReportLifecycle _lifecycleReporter;
+
+      #endregion Private Variables
+
       #region Public Properties
 
-      public IReportLifecycle ViewLifecycleReporter
+      public bool IsCleaningUp
       {
-         get => _parentLifecycleReporter;
+         get => _isCleaningUp;
          set
          {
-            _parentLifecycleReporter = value;
+            if (_isCleaningUp != value)
+            {
+               _isCleaningUp = value;
 
-            if (_parentLifecycleReporter != null)
+               if (_isCleaningUp)
+               {
+                  // Notifies the safe di container and other concerned foreign members
+                  this.SendObjectDisappearingMessage();
+               }
+            }
+         }
+      }
+
+      public IReportLifecycle LifecycleReporter
+      {
+         get => _lifecycleReporter;
+         set
+         {
+            _lifecycleReporter = value;
+
+            if (_lifecycleReporter != null)
             {
                this.SetAnyHandler
                (
-                  handler => _parentLifecycleReporter.IsDisappearing += OnParentDisappearing,
-                  handler => _parentLifecycleReporter.IsDisappearing -= OnParentDisappearing,
+                  handler => _lifecycleReporter.IsDisappearing += OnParentDisappearing,
+                  handler => _lifecycleReporter.IsDisappearing -= OnParentDisappearing,
                   (lifecycle, args) => { }
                );
             }
@@ -117,36 +128,7 @@ namespace LifecycleAware
 
       #endregion Public Properties
 
-      #region Private Destructors
-
-      ~ViewModelWithLifecycle()
-      {
-         Dispose(false);
-      }
-
-      #endregion Private Destructors
-
-      #region Public Methods
-
-      public void Dispose()
-      {
-         Dispose(true);
-         GC.SuppressFinalize(this);
-      }
-
-      #endregion Public Methods
-
       #region Protected Methods
-
-      protected virtual void Dispose(bool disposing)
-      {
-         IsDisposing = disposing;
-
-         ReleaseUnmanagedResources();
-         if (disposing)
-         {
-         }
-      }
 
       protected virtual void OnPageAppearing(ContentPage page)
       {
@@ -154,18 +136,13 @@ namespace LifecycleAware
 
       protected virtual void OnParentDisappearing(object val)
       {
-         Dispose();
+         IsCleaningUp = true;
       }
 
       [NotifyPropertyChangedInvocator]
       protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
       {
          PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-      }
-
-      protected virtual void ReleaseUnmanagedResources()
-      {
-         this.SendViewOrPageDisappearingMessage();
       }
 
       #endregion Protected Methods

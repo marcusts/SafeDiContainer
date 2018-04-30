@@ -32,27 +32,114 @@ namespace LifecycleAware.Droid
 
    using Android.App;
    using Android.Content.PM;
+   using Android.Content.Res;
    using Android.OS;
-   using SharedAndroid;
+   using Forms;
+   using SharedForms.Common.DeviceServices;
+   using SharedForms.Common.Utils;
    using Xamarin.Forms;
+   using Xamarin.Forms.Platform.Android;
 
    #endregion
 
    [Activity(Label = nameof(LifecycleAware), Icon = "@drawable/icon", Theme = "@style/MainTheme", MainLauncher = true,
       ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
-   public class MainActivity : MainActivityBase
+   public class MainActivity : FormsAppCompatActivity
    {
-      protected override Xamarin.Forms.Application CreateApplication => new App();
+      #region Public Methods
 
+      //------------------------------------------------------------------------------------------
+      public override void OnConfigurationChanged(Configuration newConfig)
+      {
+         base.OnConfigurationChanged(newConfig);
+
+         SetScreenSizeAndOrientation();
+      }
+
+      #endregion Public Methods
+
+      #region Private Variables
+
+      //------------------------------------------------------------------------------------------
+      private float _oldScreenHeight;
+
+      private float _oldScreenWidth;
+
+      #endregion Private Variables
+
+      #region Protected Methods
+
+      //------------------------------------------------------------------------------------------
       protected override void OnCreate(Bundle bundle)
       {
-         TabLayoutResource = Resource.Layout.Tabbar;
-         ToolbarResource = Resource.Layout.Toolbar;
-
          base.OnCreate(bundle);
 
          Forms.Init(this, bundle);
+
          LoadApplication(new App());
+
+         // Assign the OrientationService's event handler to listen to our orientation service's changes
+         FormsMessengerUtils.Subscribe<LocalDeviceSizeChangedMessage>(this, OrientationService.HandleDeviceSizeChanged);
+
+         SetScreenSizeAndOrientation();
+
+         if (IsPlayServicesAvailable())
+         {
+            // TODO FirebaseIIDService.RefreshToken();
+         }
       }
+
+      protected override void OnDestroy()
+      {
+         base.OnDestroy();
+
+         // Remove the device size changed subscription
+         FormsMessengerUtils.Unsubscribe<LocalDeviceSizeChangedMessage>(this);
+      }
+
+      #endregion Protected Methods
+
+      #region Private Methods
+
+      //------------------------------------------------------------------------------------------
+      private static bool IsPlayServicesAvailable()
+      {
+         /*
+         var resultCode = GoogleApiAvailability.Instance.IsGooglePlayServicesAvailable(this);
+
+         if (resultCode != ConnectionResult.Success)
+         {
+            if (GoogleApiAvailability.Instance.IsUserResolvableError(resultCode))
+            {
+               DialogFactory.ShowErrorToast(GoogleApiAvailability.Instance.GetErrorString(resultCode),
+                   useTimeout: true);
+            }
+            else
+            {
+               DialogFactory.ShowErrorToast("This device is not supported", useTimeout: true);
+               Finish();
+            }
+            return false;
+         }
+         */
+
+         return true;
+      }
+
+      private void SetScreenSizeAndOrientation()
+      {
+         var newScreenWidth = Resources.DisplayMetrics.WidthPixels / Resources.DisplayMetrics.Density;
+         var newScreenHeight = Resources.DisplayMetrics.HeightPixels / Resources.DisplayMetrics.Density;
+
+         if (newScreenHeight.IsDifferentThan(_oldScreenHeight) || newScreenWidth.IsDifferentThan(_oldScreenWidth))
+         {
+            FormsMessengerUtils.Send(new LocalDeviceSizeChangedMessage(newScreenWidth, newScreenHeight));
+
+            _oldScreenWidth = newScreenWidth;
+            _oldScreenHeight = newScreenHeight;
+         }
+      }
+
+      #endregion Private Methods
    }
 }

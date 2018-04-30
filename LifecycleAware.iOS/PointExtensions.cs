@@ -26,7 +26,7 @@
 
 #endregion
 
-namespace SharedIOS
+namespace LifecycleAware.iOS
 {
    #region Imports
 

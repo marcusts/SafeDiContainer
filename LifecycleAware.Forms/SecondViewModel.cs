@@ -24,10 +24,30 @@
 // SOFTWARE.
 #endregion
 
-namespace LifecycleAware
+namespace LifecycleAware.Forms
 {
-   public interface IReportOrMonitorPageLifecycle 
+   using System;
+   using System.Diagnostics;
+   using System.Timers;
+   using PropertyChanged;
+   using SharedForms.Common.Utils;
+
+   public interface ISecondViewModel
    {
-      
+      TimeSpan TimeRemaining { get; set; }
+
+      string Message { get; set; }
+   }
+
+   [AddINotifyPropertyChangedInterface]
+   public class SecondViewModel : ISecondViewModel
+   {
+      public SecondViewModel()
+      {
+      }
+
+      public TimeSpan TimeRemaining { get; set; }
+
+      public string Message { get; set; }
    }
 }

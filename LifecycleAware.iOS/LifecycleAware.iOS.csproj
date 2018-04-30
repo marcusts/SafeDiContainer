@@ -90,8 +90,10 @@
   <ItemGroup>
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
+    <Compile Include="ShapeRenderer.cs" />
     <None Include="Entitlements.plist" />
     <None Include="Info.plist" />
+    <Compile Include="PointExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -119,6 +121,15 @@
     <Reference Include="Xamarin.iOS" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Acr.UserDialogs">
+      <Version>7.0.1</Version>
+    </PackageReference>
+    <PackageReference Include="Fody">
+      <Version>3.0.3</Version>
+    </PackageReference>
+    <PackageReference Include="PropertyChanged.Fody">
+      <Version>2.5.4</Version>
+    </PackageReference>
     <PackageReference Include="Xamarin.Forms" Version="2.5.1.444934" />
   </ItemGroup>
   <ItemGroup>
@@ -126,12 +137,17 @@
       <Project>{34e8f81f-bbdf-42c9-9d15-c62762af91f9}</Project>
       <Name>LifecycleAware.Forms</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SharedIOS\SharedIOS.csproj">
-      <Project>{f54068b3-9bc9-4791-a19b-846215f82f66}</Project>
-      <Name>SharedIOS</Name>
-      <IsAppExtension>false</IsAppExtension>
-      <IsWatchApp>false</IsWatchApp>
+    <ProjectReference Include="..\SharedForms\SharedForms.csproj">
+      <Project>{3dfa4ca8-74c9-4f34-82a0-51bf985ea286}</Project>
+      <Name>SharedForms</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SharedUtils\SharedUtils.csproj">
+      <Project>{5db644ae-ff9b-4fc4-b03d-53bd8dbbc754}</Project>
+      <Name>SharedUtils</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="FodyWeavers.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>
