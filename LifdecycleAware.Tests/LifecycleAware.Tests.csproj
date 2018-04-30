@@ -55,10 +55,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\LifecycleAware\LifecycleAware.csproj">
-      <Project>{19505df4-2abb-41ed-9c92-8851d338dc4a}</Project>
-      <Name>LifecycleAware</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SafeDI.Lib\SafeDI.Lib.csproj">
       <Project>{2cb21269-2448-4055-a64f-a3b661dc757e}</Project>
       <Name>SafeDI.Lib</Name>
