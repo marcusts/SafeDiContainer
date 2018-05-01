@@ -26,6 +26,8 @@
 
 #endregion
 
+#define FORCE_PAGE_EVENTS
+
 namespace LifecycleAware.Lib
 {
    #region Imports
@@ -39,7 +41,7 @@ namespace LifecycleAware.Lib
    ///    WARNING: .Net does not provide IContentpage, so references to this interface type *must*
    ///    type-cast to ContentPage_LCA manually.
    /// </remarks>
-   public interface IContentPageWithLifecycle : IReportLifecycle
+   public interface IContentPageWithLifecycle : IReportLifecycle, ICanAppearAndDisappear
    {
    }
 
@@ -49,10 +51,6 @@ namespace LifecycleAware.Lib
    /// </summary>
    public class ContentPageWithLifecycle : ContentPage, IContentPageWithLifecycle
    {
-      #region Public Constructors
-
-      #endregion Public Constructors
-
       #region Public Events
 
       public event EventUtils.GenericDelegate<object> IsAppearing;
@@ -61,8 +59,27 @@ namespace LifecycleAware.Lib
 
       #endregion Public Events
 
+#region Public Methods
+
+#if FORCE_PAGE_EVENTS
+      public void ForceOnAppearing()
+      {
+         IsAppearing?.Invoke(this);
+      }
+
+      public void ForceOnDisappearing()
+      {
+         IsDisappearing?.Invoke(this);
+
+         this.SendObjectDisappearingMessage();
+      }
+#endif
+
+      #endregion Public Methods
+
       #region Protected Methods
 
+#if !FORCE_PAGE_EVENTS
       protected override void OnAppearing()
       {
          base.OnAppearing();
@@ -78,6 +95,7 @@ namespace LifecycleAware.Lib
 
          this.SendObjectDisappearingMessage();
       }
+#endif
 
       #endregion Protected Methods
    }

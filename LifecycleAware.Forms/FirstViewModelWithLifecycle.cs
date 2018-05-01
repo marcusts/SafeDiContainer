@@ -26,33 +26,39 @@
 
 namespace LifecycleAware.Forms
 {
+   using System;
    using System.Diagnostics;
+   using System.Timers;
+   using Lib;
    using PropertyChanged;
    using SharedForms.Common.Utils;
 
-   public interface IFirstViewModel
+   public interface IFirstViewModelWithLifecycle : IViewModelWithLifecycle
    {
    }
 
    [AddINotifyPropertyChangedInterface]
-   public class FirstViewModel : IFirstViewModel
+   public class FirstViewModelWithLifecycle : ViewModelWithLifecycle, IFirstViewModelWithLifecycle
    {
-      public FirstViewModel()
+      public FirstViewModelWithLifecycle()
       {
-         Debug.WriteLine("The First View Model is being created.");
+         Debug.WriteLine("The first view model with lifecycle is being created.");
 
          FormsMessengerUtils.Subscribe<TestPingMessage>(this, OnTestPing);
       }
 
-      private static void OnTestPing(object arg1, TestPingMessage arg2)
+      private void OnTestPing(object sender, TestPingMessage args)
       {
-         Debug.WriteLine("The First View Model is still listening to events!");
+         if (!IsCleaningUp)
+         {
+            Debug.WriteLine("The first view model with lifecycle is still listening to events!");
+         }
       }
 
-      ~FirstViewModel()
+      ~FirstViewModelWithLifecycle()
       {
          FormsMessengerUtils.Unsubscribe<TestPingMessage>(this);
-         Debug.WriteLine("The First View Model is FINALIZED.");
+         Debug.WriteLine("The first view model with lifecycle is FINALIZED.");
       }
    }
 }

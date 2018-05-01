@@ -26,8 +26,6 @@
 
 #endregion
 
-#define FORCE_CLEANUP
-
 namespace LifecycleAware.Forms
 {
    #region Imports
@@ -36,12 +34,13 @@ namespace LifecycleAware.Forms
    using System.Diagnostics;
    using System.Threading.Tasks;
    using System.Timers;
+   using Lib;
    using SharedForms.Common.Utils;
    using Xamarin.Forms;
 
    #endregion
 
-   public partial class App : Application
+   public partial class App : Application, IManagePageChanges
    {
       #region Public Constructors
 
@@ -49,72 +48,52 @@ namespace LifecycleAware.Forms
       {
          InitializeComponent();
 
+         // Required by IOS
+         MainPage = new ContentPage();
+
          StartFirstTest();
-      }
-
-      private void StartFirstTest()
-      {
-         var secondViewModel = new SecondViewModel
-         {
-            TimeRemaining = TOTAL_BROADCAST_TIME
-         };
-
-         var timer = new Timer(DELAY_BETWEEN_BROADCASTS);
-         var timeToStop = DateTime.Now + TOTAL_BROADCAST_TIME;
-         timer.Elapsed += (sender, args) =>
-         {
-            FormsMessengerUtils.Send(new TestPingMessage());
-
-            secondViewModel.TimeRemaining -= TimeSpan.FromMilliseconds(DELAY_BETWEEN_BROADCASTS);
-
-            if (DateTime.Now >= timeToStop)
-            {
-               secondViewModel.Message = "FINISHED";
-
-               secondViewModel.TimeRemaining = TimeSpan.FromSeconds(0);
-
-               Debug.WriteLine("Starting garbage collection");
-               GC.Collect();
-               Debug.WriteLine("Finished garbage collection");
-
-               timer.Stop();
-               timer.Dispose();
-
-               StartSecondTest();
-            }
-         };
-
-         timer.Start();
-
-         var firstPage = new FirstPage { BindingContext = new FirstViewModel() };
-         Debug.WriteLine("About to assign the main page to the first page.");
-         MainPage = firstPage;
-
-         Device.BeginInvokeOnMainThread
-         (
-            async () =>
-            {
-               Debug.WriteLine("Finished assigning the main page to the first page.");
-               await Task.Delay(5000);
-               Debug.WriteLine("About to assign the main page to the second page.");
-               MainPage = new SecondPage { BindingContext = secondViewModel };
-               secondViewModel.Message = "Working...";
-               Debug.WriteLine("Finished assigning the main page to the second page.");
-               Debug.WriteLine("The first view model is now OUT OF SCOPE and should not be active.");
-            });
-      }
-
-      private void StartSecondTest()
-      {
-         // TODO_IMPLEMENT_ME();
       }
 
       #endregion Public Constructors
 
+      #region Public Methods
+
+      public void SetMainPage(Page newPage)
+      {
+         if (MainPage is ICanAppearAndDisappear lastPageAsAppearDisappear)
+         {
+            lastPageAsAppearDisappear.ForceOnDisappearing();
+         }
+
+         try
+         {
+            MainPage = newPage;
+         }
+         catch (Exception e)
+         {
+            Console.WriteLine(e);
+         }
+
+         if (MainPage is ICanAppearAndDisappear nextPageAsAppearDisappear)
+         {
+            nextPageAsAppearDisappear.ForceOnAppearing();
+         }
+      }
+
+      #endregion Public Methods
+
+      #region Private Events
+
+      private event EventUtils.NoParamsDelegate TestCompleted;
+
+      #endregion Private Events
+
       #region Private Variables
 
       private static readonly double DELAY_BETWEEN_BROADCASTS = 1000;
+
       private static readonly TimeSpan TOTAL_BROADCAST_TIME = TimeSpan.FromSeconds(30);
+      private Timer _timer;
 
       #endregion Private Variables
 
@@ -136,5 +115,91 @@ namespace LifecycleAware.Forms
       }
 
       #endregion Protected Methods
+
+      #region Private Methods
+
+      private SecondViewModel SetUpTest()
+      {
+         var secondViewModel = new SecondViewModel
+         {
+            TimeRemaining = TOTAL_BROADCAST_TIME
+         };
+
+         _timer = new Timer(DELAY_BETWEEN_BROADCASTS);
+         var timeToStop = DateTime.Now + TOTAL_BROADCAST_TIME;
+         _timer.Elapsed += (sender, args) =>
+         {
+            FormsMessengerUtils.Send(new TestPingMessage());
+
+            secondViewModel.TimeRemaining -= TimeSpan.FromMilliseconds(DELAY_BETWEEN_BROADCASTS);
+
+            if (DateTime.Now >= timeToStop)
+            {
+               secondViewModel.Message = "FINISHED";
+
+               secondViewModel.TimeRemaining = TimeSpan.FromSeconds(0);
+
+               Debug.WriteLine("Starting garbage collection");
+               GC.Collect();
+               Debug.WriteLine("Finished garbage collection");
+
+               _timer.Stop();
+               _timer.Dispose();
+
+               TestCompleted?.Invoke();
+            }
+         };
+
+         _timer.Start();
+         return secondViewModel;
+      }
+
+      private void StartFirstTest()
+      {
+         TestCompleted += StartSecondTest;
+
+         Device.BeginInvokeOnMainThread(async () =>
+         {
+            var secondViewModel = SetUpTest();
+
+            var firstPage = new FirstPage { BindingContext = new FirstViewModel() };
+            Debug.WriteLine("About to assign the main page to the first page.");
+            SetMainPage(firstPage);
+
+            Debug.WriteLine("Finished assigning the main page to the first page.");
+            await Task.Delay(5000);
+            Debug.WriteLine("About to assign the main page to the second page.");
+            SetMainPage(new SecondPage { BindingContext = secondViewModel });
+            secondViewModel.Message = "Working...";
+            Debug.WriteLine("Finished assigning the main page to the second page.");
+            Debug.WriteLine("The first view model is now OUT OF SCOPE and should not be active.");
+         });
+      }
+
+      private void StartSecondTest()
+      {
+         TestCompleted -= StartSecondTest;
+
+         Device.BeginInvokeOnMainThread(async () =>
+         {
+            var secondViewModel = SetUpTest();
+
+            var firstViewModelWithLifecycle = new FirstViewModelWithLifecycle();
+            var firstPageWithLifecycle = new FirstPageWithLifecycle { BindingContext = firstViewModelWithLifecycle };
+            firstViewModelWithLifecycle.LifecycleReporter = firstPageWithLifecycle;
+            Debug.WriteLine("About to assign the main page to the first page with Lifecycle.");
+            SetMainPage(firstPageWithLifecycle);
+
+            Debug.WriteLine("Finished assigning the main page to the first page with Lifecycle.");
+            await Task.Delay(5000);
+            Debug.WriteLine("About to assign the main page to the second page.");
+            SetMainPage(new SecondPage { BindingContext = secondViewModel });
+            secondViewModel.Message = "Working...";
+            Debug.WriteLine("Finished assigning the main page to the second page.");
+            Debug.WriteLine("The first view model with Lifecycle is now OUT OF SCOPE and should not be active.");
+         });
+      }
+
+      #endregion Private Methods
    }
 }

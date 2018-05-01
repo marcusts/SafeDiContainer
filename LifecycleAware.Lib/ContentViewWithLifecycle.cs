@@ -39,11 +39,6 @@ namespace LifecycleAware.Lib
 
    public interface IContentViewWithLifecycle : IHostLifecycleReporter, IReportEndOfLifecycle, ICanCleanUp
    {
-      #region Public Properties
-
-      IReportLifecycle LifecycleReporter { get; set; }
-
-      #endregion Public Properties
    }
 
    /// <summary>

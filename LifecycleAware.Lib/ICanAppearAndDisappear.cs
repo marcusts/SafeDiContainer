@@ -24,35 +24,12 @@
 // SOFTWARE.
 #endregion
 
-namespace LifecycleAware.Forms
+namespace LifecycleAware.Lib
 {
-   using System.Diagnostics;
-   using PropertyChanged;
-   using SharedForms.Common.Utils;
-
-   public interface IFirstViewModel
+   public interface ICanAppearAndDisappear
    {
-   }
+      void ForceOnAppearing();
 
-   [AddINotifyPropertyChangedInterface]
-   public class FirstViewModel : IFirstViewModel
-   {
-      public FirstViewModel()
-      {
-         Debug.WriteLine("The First View Model is being created.");
-
-         FormsMessengerUtils.Subscribe<TestPingMessage>(this, OnTestPing);
-      }
-
-      private static void OnTestPing(object arg1, TestPingMessage arg2)
-      {
-         Debug.WriteLine("The First View Model is still listening to events!");
-      }
-
-      ~FirstViewModel()
-      {
-         FormsMessengerUtils.Unsubscribe<TestPingMessage>(this);
-         Debug.WriteLine("The First View Model is FINALIZED.");
-      }
+      void ForceOnDisappearing();
    }
 }
