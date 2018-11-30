@@ -34,250 +34,250 @@ namespace SharedForms.Views.Controls
 
    public class ImageButton : GenericViewButtonBase<Image>, IImageButton
    {
-      #region Public Constructors
+     #region Public Constructors
 
-      public ImageButton()
-      {
-         // Force-refresh the image styles; this will configure the Image properly
-         SetStyle();
-      }
+     public ImageButton()
+     {
+       // Force-refresh the image styles; this will configure the Image properly
+       SetStyle();
+     }
 
-      #endregion Public Constructors
+     #endregion Public Constructors
 
-      #region Public Methods
+     #region Public Methods
 
-      public static BindableProperty CreateImageButtonBindableProperty<PropertyTypeT>
-      (
-         string localPropName,
-         PropertyTypeT defaultVal = default(PropertyTypeT),
-         BindingMode bindingMode = BindingMode.OneWay,
-         Action<ImageButton, PropertyTypeT, PropertyTypeT> callbackAction = null
-      )
-      {
-         return BindableUtils.CreateBindableProperty(localPropName, defaultVal, bindingMode, callbackAction);
-      }
+     public static BindableProperty CreateImageButtonBindableProperty<PropertyTypeT>
+     (
+       string localPropName,
+       PropertyTypeT defaultVal = default(PropertyTypeT),
+       BindingMode bindingMode = BindingMode.OneWay,
+       Action<ImageButton, PropertyTypeT, PropertyTypeT> callbackAction = null
+     )
+     {
+       return BindableUtils.CreateBindableProperty(localPropName, defaultVal, bindingMode, callbackAction);
+     }
 
-      #endregion Public Methods
+     #endregion Public Methods
 
-      #region Protected Methods
+     #region Protected Methods
 
-      protected override void SetStyle()
-      {
-         if (_setStyleEntered)
+     protected override void SetStyle()
+     {
+       if (_setStyleEntered)
+       {
+         return;
+       }
+
+       _setStyleEntered = true;
+
+       base.SetStyle();
+
+       CallRecreateImageSafely();
+
+       _setStyleEntered = false;
+     }
+
+     #endregion Protected Methods
+
+     #region Public Variables
+
+     public static readonly BindableProperty ImageFileNameRootProperty =
+       CreateImageButtonBindableProperty
+       (
+         nameof(ImageFileNameRoot),
+         default(string),
+         BindingMode.OneWay,
+         (imageButton, oldVal, newVal) => { imageButton.ImageFileNameRoot = newVal; }
+       );
+
+     //---------------------------------------------------------------------------------------------------------------
+     // CONSTRUCTOR
+     //---------------------------------------------------------------------------------------------------------------
+     //---------------------------------------------------------------------------------------------------------------
+     // CONSTANTS
+     //---------------------------------------------------------------------------------------------------------------
+     public static readonly BindableProperty ImageHeightProperty =
+       CreateImageButtonBindableProperty
+       (
+         nameof(ImageHeight),
+         default(double),
+         BindingMode.OneWay,
+         (imageButton, oldVal, newVal) => { imageButton.ImageHeight = newVal; }
+       );
+
+     public static readonly BindableProperty ImageWidthProperty =
+       CreateImageButtonBindableProperty
+       (
+         nameof(ImageWidth),
+         default(double),
+         BindingMode.OneWay,
+         (imageButton, oldVal, newVal) => { imageButton.ImageWidth = newVal; }
+       );
+
+     #endregion Public Variables
+
+     #region Private Variables
+
+     private const string DISABLED_SUFFIX = "_disabled";
+
+     private const string PNG_SUFFIX = ".png";
+
+     private const string SELECTED_SUFFIX = "_selected";
+
+     private string _imageFileNameRoot;
+
+     //---------------------------------------------------------------------------------------------------------------
+     // PROPERTIES - Public
+     //---------------------------------------------------------------------------------------------------------------
+     private double _imageHeight;
+
+     private double _imageWidth;
+
+     private string _lastImageFileName;
+
+     private bool _setStyleEntered;
+
+     #endregion Private Variables
+
+     #region Public Properties
+
+     //---------------------------------------------------------------------------------------------------------------
+     // VARIABLES
+     //---------------------------------------------------------------------------------------------------------------
+     public string ImageFileNameRoot
+     {
+       get => _imageFileNameRoot;
+       set
+       {
+         if (_imageFileNameRoot.IsDifferentThan(value))
          {
-            return;
+            _imageFileNameRoot = value;
+            CallRecreateImageSafely();
          }
+       }
+     }
 
-         _setStyleEntered = true;
-
-         base.SetStyle();
-
-         CallRecreateImageSafely();
-
-         _setStyleEntered = false;
-      }
-
-      #endregion Protected Methods
-
-      #region Public Variables
-
-      public static readonly BindableProperty ImageFileNameRootProperty =
-         CreateImageButtonBindableProperty
-         (
-            nameof(ImageFileNameRoot),
-            default(string),
-            BindingMode.OneWay,
-            (imageButton, oldVal, newVal) => { imageButton.ImageFileNameRoot = newVal; }
-         );
-
-      //---------------------------------------------------------------------------------------------------------------
-      // CONSTRUCTOR
-      //---------------------------------------------------------------------------------------------------------------
-      //---------------------------------------------------------------------------------------------------------------
-      // CONSTANTS
-      //---------------------------------------------------------------------------------------------------------------
-      public static readonly BindableProperty ImageHeightProperty =
-         CreateImageButtonBindableProperty
-         (
-            nameof(ImageHeight),
-            default(double),
-            BindingMode.OneWay,
-            (imageButton, oldVal, newVal) => { imageButton.ImageHeight = newVal; }
-         );
-
-      public static readonly BindableProperty ImageWidthProperty =
-         CreateImageButtonBindableProperty
-         (
-            nameof(ImageWidth),
-            default(double),
-            BindingMode.OneWay,
-            (imageButton, oldVal, newVal) => { imageButton.ImageWidth = newVal; }
-         );
-
-      #endregion Public Variables
-
-      #region Private Variables
-
-      private const string DISABLED_SUFFIX = "_disabled";
-
-      private const string PNG_SUFFIX = ".png";
-
-      private const string SELECTED_SUFFIX = "_selected";
-
-      private string _imageFileNameRoot;
-
-      //---------------------------------------------------------------------------------------------------------------
-      // PROPERTIES - Public
-      //---------------------------------------------------------------------------------------------------------------
-      private double _imageHeight;
-
-      private double _imageWidth;
-
-      private string _lastImageFileName;
-
-      private bool _setStyleEntered;
-
-      #endregion Private Variables
-
-      #region Public Properties
-
-      //---------------------------------------------------------------------------------------------------------------
-      // VARIABLES
-      //---------------------------------------------------------------------------------------------------------------
-      public string ImageFileNameRoot
-      {
-         get => _imageFileNameRoot;
-         set
+     //---------------------------------------------------------------------------------------------------------------
+     // METHODS - Protected
+     //---------------------------------------------------------------------------------------------------------------
+     public double ImageHeight
+     {
+       get => _imageHeight;
+       set
+       {
+         if (_imageHeight.IsDifferentThan(value))
          {
-            if (_imageFileNameRoot.IsDifferentThan(value))
-            {
-               _imageFileNameRoot = value;
-               CallRecreateImageSafely();
-            }
+            _imageHeight = value;
+            CallRecreateImageSafely();
          }
-      }
+       }
+     }
 
-      //---------------------------------------------------------------------------------------------------------------
-      // METHODS - Protected
-      //---------------------------------------------------------------------------------------------------------------
-      public double ImageHeight
-      {
-         get => _imageHeight;
-         set
+     public double ImageWidth
+     {
+       get => _imageWidth;
+       set
+       {
+         if (_imageWidth.IsDifferentThan(value))
          {
-            if (_imageHeight.IsDifferentThan(value))
-            {
-               _imageHeight = value;
-               CallRecreateImageSafely();
-            }
+            _imageWidth = value;
+            CallRecreateImageSafely();
          }
-      }
+       }
+     }
 
-      public double ImageWidth
-      {
-         get => _imageWidth;
-         set
+     #endregion Public Properties
+
+     //---------------------------------------------------------------------------------------------------------------
+     // METHODS - Private
+     //---------------------------------------------------------------------------------------------------------------
+
+     #region Private Methods
+
+     private void CallRecreateImageSafely()
+     {
+       if (ThreadHelper.IsOnMainThread)
+       {
+         RecreateImage();
+       }
+       else
+       {
+         Device.BeginInvokeOnMainThread(RecreateImage);
+       }
+     }
+
+     private void RecreateImage()
+     {
+       if (ImageWidth.IsEmpty() && ImageHeight.IsEmpty())
+       {
+         return;
+       }
+
+       var imageFileName = _imageFileNameRoot;
+
+       // If no selection, just use the root file name.
+       if (CanSelect)
+       {
+         //Determine the current file name
+         switch (ButtonState)
          {
-            if (_imageWidth.IsDifferentThan(value))
-            {
-               _imageWidth = value;
-               CallRecreateImageSafely();
-            }
+            case ButtonStates.Selected:
+              imageFileName += SELECTED_SUFFIX;
+              break;
+
+            case ButtonStates.Disabled:
+              imageFileName += DISABLED_SUFFIX;
+              break;
+
+            default:
+              // case ButtonStates.Deselected:
+              break;
          }
-      }
+       }
 
-      #endregion Public Properties
+       if (imageFileName.IsEmpty())
+       {
+         return;
+       }
 
-      //---------------------------------------------------------------------------------------------------------------
-      // METHODS - Private
-      //---------------------------------------------------------------------------------------------------------------
+       // InternalView = null;
 
-      #region Private Methods
+       if (!imageFileName.EndsWith(PNG_SUFFIX))
+       {
+         imageFileName += PNG_SUFFIX;
+       }
 
-      private void CallRecreateImageSafely()
-      {
-         if (ThreadHelper.IsOnMainThread)
-         {
-            RecreateImage();
-         }
-         else
-         {
-            Device.BeginInvokeOnMainThread(RecreateImage);
-         }
-      }
+       if (imageFileName.IsSameAs(_lastImageFileName))
+       {
+         return;
+       }
 
-      private void RecreateImage()
-      {
-         if (ImageWidth.IsEmpty() && ImageHeight.IsEmpty())
-         {
-            return;
-         }
+       InternalView = FormsUtils.GetImage(imageFileName, ImageWidth, ImageHeight);
 
-         var imageFileName = _imageFileNameRoot;
+       // The image always has a transparent background
+       InternalView.BackgroundColor = Color.Transparent;
 
-         // If no selection, just use the root file name.
-         if (CanSelect)
-         {
-            //Determine the current file name
-            switch (ButtonState)
-            {
-               case ButtonStates.Selected:
-                  imageFileName += SELECTED_SUFFIX;
-                  break;
+       InternalView.InputTransparent = true;
 
-               case ButtonStates.Disabled:
-                  imageFileName += DISABLED_SUFFIX;
-                  break;
+       _lastImageFileName = imageFileName;
+     }
 
-               default:
-                  // case ButtonStates.Deselected:
-                  break;
-            }
-         }
+     #endregion Private Methods
 
-         if (imageFileName.IsEmpty())
-         {
-            return;
-         }
-
-         // InternalView = null;
-
-         if (!imageFileName.EndsWith(PNG_SUFFIX))
-         {
-            imageFileName += PNG_SUFFIX;
-         }
-
-         if (imageFileName.IsSameAs(_lastImageFileName))
-         {
-            return;
-         }
-
-         InternalView = FormsUtils.GetImage(imageFileName, ImageWidth, ImageHeight);
-
-         // The image always has a transparent background
-         InternalView.BackgroundColor = Color.Transparent;
-
-         InternalView.InputTransparent = true;
-
-         _lastImageFileName = imageFileName;
-      }
-
-      #endregion Private Methods
-
-      //---------------------------------------------------------------------------------------------------------------
-      // BINDABLE PROPERTIES
-      //---------------------------------------------------------------------------------------------------------------
+     //---------------------------------------------------------------------------------------------------------------
+     // BINDABLE PROPERTIES
+     //---------------------------------------------------------------------------------------------------------------
    }
 
    public interface IImageButton : IGenericViewButtonBase<Image>
    {
-      #region Public Properties
+     #region Public Properties
 
-      string ImageFileNameRoot { get; set; }
+     string ImageFileNameRoot { get; set; }
 
-      double ImageHeight { get; set; }
-      double ImageWidth { get; set; }
+     double ImageHeight { get; set; }
+     double ImageWidth { get; set; }
 
-      #endregion Public Properties
+     #endregion Public Properties
    }
 }

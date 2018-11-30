@@ -25,12 +25,12 @@ namespace SharedForms.Common.Utils
 {
    public static class EventUtils
    {
-      #region Public Delegates
+     #region Public Delegates
 
-      public delegate void GenericDelegate<in T>(T val);
+     public delegate void GenericDelegate<in T>(T val);
 
-      public delegate void NoParamsDelegate();
+     public delegate void NoParamsDelegate();
 
-      #endregion Public Delegates
+     #endregion Public Delegates
    }
 }

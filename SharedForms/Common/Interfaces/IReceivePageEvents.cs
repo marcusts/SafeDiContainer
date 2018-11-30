@@ -25,10 +25,10 @@ namespace SharedForms.Common.Interfaces
 {
    public interface IReceivePageEvents
    {
-      #region Public Properties
+     #region Public Properties
 
-      IProvidePageEvents PageEventProvider { get; set; }
+     IProvidePageEvents PageEventProvider { get; set; }
 
-      #endregion Public Properties
+     #endregion Public Properties
    }
 }

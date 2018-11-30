@@ -1,21 +1,21 @@
 #region License
 
 // MIT License
-// 
-// Copyright (c) 2018 
+//
+// Copyright (c) 2018
 // Marcus Technical Services, Inc.
 // http://www.marcusts.com
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,24 +24,32 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#endregion
+#endregion License
 
 // #define USE_SHADOW
 
-namespace LifecycleAware.Droid
+using Canvas = Android.Graphics.Canvas;
+using Context = Android.Content.Context;
+using CornerPathEffect = Android.Graphics.CornerPathEffect;
+using Matrix = Android.Graphics.Matrix;
+using Paint = Android.Graphics.Paint;
+using PaintFlags = Android.Graphics.PaintFlags;
+using Path = Android.Graphics.Path;
+using PointF = Android.Graphics.PointF;
+using RectF = Android.Graphics.RectF;
+using View = Android.Views.View;
+
+namespace LifecycleAware.Android
 {
    #region Imports
 
    using System;
    using System.Collections.ObjectModel;
    using System.Linq;
-   using Android.Content;
-   using Android.Graphics;
-   using Android.Views;
    using SharedForms.Views.Controls;
    using Xamarin.Forms.Platform.Android;
 
-   #endregion
+   #endregion Imports
 
    public class Shape : View
    {
@@ -60,10 +68,10 @@ namespace LifecycleAware.Droid
       }
 
 #if USE_SHADOW
-      private static int convertTo255ScaleColor(double color)
-      {
-         return (int)Math.Ceiling(color * 255);
-      }
+     private static int convertTo255ScaleColor(double color)
+     {
+       return (int)Math.Ceiling(color * 255);
+     }
 #endif
 
       protected override void OnDraw(Canvas canvas)
@@ -91,11 +99,11 @@ namespace LifecycleAware.Droid
             strokePaint.Color = _shapeView.BorderColor.ToAndroid();
 
 #if USE_SHADOW
-            // NEEDS TO BE A BOTTOM RIGHT SHADOW -- THE REST SHOULD NOT DRAW
-            strokePaint.SetARGB(convertTo255ScaleColor(_shapeView.BorderColor.A), convertTo255ScaleColor(_shapeView.BorderColor.R), convertTo255ScaleColor(_shapeView.BorderColor.G), convertTo255ScaleColor(_shapeView.BorderColor.B));
-            var shadowOffset = (float)(Math.Min(_shapeView.WidthRequest, _shapeView.HeightRequest) * 0.05);
-            strokePaint.SetShadowLayer(_shapeView.CornerRadius, shadowOffset, shadowOffset, Android.Graphics.Color.Argb(150, 0, 0, 0));
-            SetLayerType(Android.Views.LayerType.Software, strokePaint);
+         // NEEDS TO BE A BOTTOM RIGHT SHADOW -- THE REST SHOULD NOT DRAW
+         strokePaint.SetARGB(convertTo255ScaleColor(_shapeView.BorderColor.A), convertTo255ScaleColor(_shapeView.BorderColor.R), convertTo255ScaleColor(_shapeView.BorderColor.G), convertTo255ScaleColor(_shapeView.BorderColor.B));
+         var shadowOffset = (float)(Math.Min(_shapeView.WidthRequest, _shapeView.HeightRequest) * 0.05);
+         strokePaint.SetShadowLayer(_shapeView.CornerRadius, shadowOffset, shadowOffset, Android.Graphics.Color.Argb(150, 0, 0, 0));
+         SetLayerType(Android.Views.LayerType.Software, strokePaint);
 #endif
 
             x += strokeWidth / 2f;
@@ -135,30 +143,37 @@ namespace LifecycleAware.Droid
             case ShapeType.Box:
                DrawBox(canvas, x, y, width, height, _shapeView.CornerRadius, fillPaint, strokePaint);
                break;
+
             case ShapeType.Circle:
                DrawCircle(canvas, cx, cy, Math.Min(height, width) / 2f, fillPaint, strokePaint);
                break;
+
             case ShapeType.Oval:
                DrawOval(canvas, x, y, width, height, fillPaint, strokePaint);
                break;
+
             case ShapeType.Star:
                var outerRadius = (Math.Min(height, width) - strokeWidth) / 2f;
                var innerRadius = outerRadius * _shapeView.RadiusRatio;
 
                DrawStar(canvas, cx, cy, outerRadius, innerRadius, _shapeView.CornerRadius, _shapeView.NumberOfPoints,
-                  fillPaint, strokePaint);
+                 fillPaint, strokePaint);
                break;
+
             case ShapeType.Triangle:
                DrawTriangle(canvas, x + strokeWidth / 2, y + strokeWidth / 2, width - strokeWidth, height - strokeWidth,
-                  fillPaint, strokePaint);
+                 fillPaint, strokePaint);
                break;
+
             case ShapeType.Diamond:
                DrawDiamond(canvas, x + strokeWidth / 2, y + strokeWidth / 2, width - strokeWidth, height - strokeWidth,
-                  fillPaint, strokePaint);
+                 fillPaint, strokePaint);
                break;
+
             case ShapeType.Heart:
                DrawHeart(canvas, x, y, width, height, Resize(_shapeView.CornerRadius), fillPaint, strokePaint);
                break;
+
             case ShapeType.ProgressCircle:
                DrawCircle(canvas, cx, cy, Math.Min(height, width) / 2f, fillPaint, strokePaint);
 
@@ -183,18 +198,19 @@ namespace LifecycleAware.Droid
                }
 
                break;
+
             case ShapeType.Path:
                DrawPath(canvas, _shapeView.Points, x, y, fillPaint, strokePaint);
                break;
          }
       }
 
-#region Drawing Methods
+      #region Drawing Methods
 
-#region Basic shapes
+      #region Basic shapes
 
       protected virtual void DrawBox(Canvas canvas, float left, float top, float width, float height,
-         float cornerRadius, Paint fillPaint, Paint strokePaint)
+        float cornerRadius, Paint fillPaint, Paint strokePaint)
       {
          var rect = new RectF(left, top, left + width, top + height);
          if (cornerRadius > 0)
@@ -225,7 +241,7 @@ namespace LifecycleAware.Droid
       }
 
       protected virtual void DrawCircle(Canvas canvas, float cx, float cy, float radius, Paint fillPaint,
-         Paint strokePaint)
+        Paint strokePaint)
       {
          if (fillPaint != null)
          {
@@ -239,7 +255,7 @@ namespace LifecycleAware.Droid
       }
 
       protected virtual void DrawOval(Canvas canvas, float left, float top, float width, float height, Paint fillPaint,
-         Paint strokePaint)
+        Paint strokePaint)
       {
          var rect = new RectF(left, top, left + width, top + height);
 
@@ -255,7 +271,7 @@ namespace LifecycleAware.Droid
       }
 
       protected virtual void DrawProgressCircle(Canvas canvas, float cx, float cy, float radius, float progress,
-         Paint progressPaint)
+        Paint progressPaint)
       {
          if (progressPaint != null)
          {
@@ -266,12 +282,12 @@ namespace LifecycleAware.Droid
          }
       }
 
-#endregion
+      #endregion Basic shapes
 
-#region Path Methods
+      #region Path Methods
 
       protected virtual void DrawStar(Canvas canvas, float cx, float cy, float outerRadius, float innerRadius,
-         float cornerRadius, int numberOfPoints, Paint fillPaint, Paint strokePaint)
+        float cornerRadius, int numberOfPoints, Paint fillPaint, Paint strokePaint)
       {
          if (numberOfPoints <= 0)
          {
@@ -292,8 +308,8 @@ namespace LifecycleAware.Droid
             var currentRadius = isOuter ? innerRadius : outerRadius;
             isOuter = !isOuter;
 
-            xPath = (float) (currentRadius * Math.Sin(i)) + cx;
-            yPath = (float) (currentRadius * Math.Cos(i)) + cy;
+            xPath = (float)(currentRadius * Math.Sin(i)) + cx;
+            yPath = (float)(currentRadius * Math.Cos(i)) + cy;
 
             path.LineTo(xPath, yPath);
 
@@ -314,7 +330,7 @@ namespace LifecycleAware.Droid
       }
 
       protected virtual void DrawDiamond(Canvas canvas, float x, float y, float width, float height, Paint fillPaint,
-         Paint strokePaint)
+        Paint strokePaint)
       {
          var path = new Path();
 
@@ -331,7 +347,7 @@ namespace LifecycleAware.Droid
       }
 
       protected virtual void DrawTriangle(Canvas canvas, float x, float y, float width, float height, Paint fillPaint,
-         Paint strokePaint)
+        Paint strokePaint)
       {
          var path = new Path();
 
@@ -344,7 +360,7 @@ namespace LifecycleAware.Droid
       }
 
       protected virtual void DrawHeart(Canvas canvas, float x, float y, float width, float height, float cornerRadius,
-         Paint fillPaint, Paint strokePaint)
+        Paint fillPaint, Paint strokePaint)
       {
          var length = Math.Min(height, width);
 
@@ -392,7 +408,7 @@ namespace LifecycleAware.Droid
       }
 
       protected virtual void DrawPath(Canvas canvas, ObservableCollection<Xamarin.Forms.Point> points, float x, float y,
-         Paint fillPaint, Paint strokePaint)
+        Paint fillPaint, Paint strokePaint)
       {
          if (points == null || points.Count == 0)
          {
@@ -433,22 +449,16 @@ namespace LifecycleAware.Droid
          }
       }
 
-#endregion
+      #endregion Path Methods
 
-#endregion
+      #endregion Drawing Methods
 
-#region Density Helpers
+      #region Density Helpers
 
-      protected float Resize(float input)
-      {
-         return input * _density;
-      }
+      protected float Resize(float input) => input * _density;
 
-      protected float Resize(double input)
-      {
-         return Resize((float) input);
-      }
+      protected float Resize(double input) => Resize((float)input);
 
-#endregion
+      #endregion Density Helpers
    }
 }

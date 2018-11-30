@@ -31,21 +31,21 @@ namespace SharedForms.Common.Utils
 
    public static class ThreadHelper
    {
-      #region Public Methods
+     #region Public Methods
 
-      public static void Initialize(int mainThreadId)
-      {
-         MainThreadId = mainThreadId;
-      }
+     public static void Initialize(int mainThreadId)
+     {
+       MainThreadId = mainThreadId;
+     }
 
-      #endregion Public Methods
+     #endregion Public Methods
 
-      #region Public Properties
+     #region Public Properties
 
-      public static bool IsOnMainThread => Environment.CurrentManagedThreadId == MainThreadId;
+     public static bool IsOnMainThread => Environment.CurrentManagedThreadId == MainThreadId;
 
-      public static int MainThreadId { get; private set; }
+     public static int MainThreadId { get; private set; }
 
-      #endregion Public Properties
+     #endregion Public Properties
    }
 }

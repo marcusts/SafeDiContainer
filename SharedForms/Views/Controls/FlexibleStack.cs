@@ -34,101 +34,101 @@ namespace SharedForms.Views.Controls
 
    public class FlexibleStack<T> : IEnumerable<T>
    {
-      #region Private Variables
+     #region Private Variables
 
-      private readonly IList<T> _items = new List<T>();
+     private readonly IList<T> _items = new List<T>();
 
-      #endregion Private Variables
+     #endregion Private Variables
 
-      #region Private Methods
+     #region Private Methods
 
-      private T PopOrPeek(bool removeIt)
-      {
-         if (_items.Count > 0)
+     private T PopOrPeek(bool removeIt)
+     {
+       if (_items.Count > 0)
+       {
+         var temp = _items[_items.Count - 1];
+
+         if (removeIt)
          {
-            var temp = _items[_items.Count - 1];
-
-            if (removeIt)
-            {
-               _items.RemoveAt(_items.Count - 1);
-            }
-
-            return temp;
+            _items.RemoveAt(_items.Count - 1);
          }
 
-         // FAIL CASE
-         return default(T);
-      }
+         return temp;
+       }
 
-      #endregion Private Methods
+       // FAIL CASE
+       return default(T);
+     }
 
-      #region Public Methods
+     #endregion Private Methods
 
-      public void Clear()
-      {
-         _items.Clear();
-      }
+     #region Public Methods
 
-      public IEnumerator<T> GetEnumerator()
-      {
-         return _items.GetEnumerator();
-      }
+     public void Clear()
+     {
+       _items.Clear();
+     }
 
-      IEnumerator IEnumerable.GetEnumerator()
-      {
-         return GetEnumerator();
-      }
+     public IEnumerator<T> GetEnumerator()
+     {
+       return _items.GetEnumerator();
+     }
 
-      public T Peek()
-      {
-         return PopOrPeek(false);
-      }
+     IEnumerator IEnumerable.GetEnumerator()
+     {
+       return GetEnumerator();
+     }
 
-      public T Pop()
-      {
-         return PopOrPeek(true);
-      }
+     public T Peek()
+     {
+       return PopOrPeek(false);
+     }
 
-      public void Push(T item)
-      {
-         _items.Add(item);
-      }
+     public T Pop()
+     {
+       return PopOrPeek(true);
+     }
 
-      public void RemoveIfPresent(T item, Predicate<T> dupTest)
-      {
-         if (_items.IsEmpty() || dupTest == null)
+     public void Push(T item)
+     {
+       _items.Add(item);
+     }
+
+     public void RemoveIfPresent(T item, Predicate<T> dupTest)
+     {
+       if (_items.IsEmpty() || dupTest == null)
+       {
+         return;
+       }
+
+       var itemIdx = 0;
+
+       do
+       {
+         var currItem = _items[itemIdx];
+
+         if (dupTest(currItem))
          {
-            return;
+            _items.Remove(item);
+
+            // Do *not* increment item idx
          }
-
-         var itemIdx = 0;
-
-         do
+         else
          {
-            var currItem = _items[itemIdx];
+            itemIdx++;
+         }
+       } while (itemIdx < _items.Count);
+     }
 
-            if (dupTest(currItem))
-            {
-               _items.Remove(item);
+     #endregion Public Methods
 
-               // Do *not* increment item idx
-            }
-            else
-            {
-               itemIdx++;
-            }
-         } while (itemIdx < _items.Count);
-      }
-
-      #endregion Public Methods
-
-      //public void RemoveIfPresent(T item)
-      //{
-      //   // Can remove more than one.
-      //   while (_items.Contains(item))
-      //   {
-      //      _items.Remove(item);
-      //   }
-      //}
+     //public void RemoveIfPresent(T item)
+     //{
+     //   // Can remove more than one.
+     //   while (_items.Contains(item))
+     //   {
+     //     _items.Remove(item);
+     //   }
+     //}
    }
 }

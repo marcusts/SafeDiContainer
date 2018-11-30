@@ -1,9 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:local="clr-namespace:LifecycleAware"
-             x:Class="LifecycleAware.Forms.FirstPage">
+          xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+          x:Class="LifecycleAware.Forms.FirstPage">
 
-   <Label Text="FIRST PAGE" VerticalOptions="Center" HorizontalOptions="Center" FontSize="Large"/>
-
+   <Label Text="First Page (NO Lifecycle Management)" VerticalOptions="Center" HorizontalOptions="Center" FontSize="Large" />
 </ContentPage>

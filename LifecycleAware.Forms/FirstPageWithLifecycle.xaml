@@ -1,11 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<lib:ContentPageWithLifecycle 
+<pages:ContentPageWithLifecycle
    xmlns="http://xamarin.com/schemas/2014/forms"
    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-   xmlns:lib="clr-namespace:LifecycleAware.Lib;assembly=LifecycleAware.Lib"
+   xmlns:pages="clr-namespace:LifecycleAware.Lib.Views.Pages;assembly=LifecycleAware.Lib"
    x:Class="LifecycleAware.Forms.FirstPageWithLifecycle"
 >
 
-   <Label Text="FIRST PAGE WITH Lifecycle" VerticalOptions="Center" HorizontalOptions="Center" FontSize="Large"/>
-
-</lib:ContentPageWithLifecycle>
+   <Label Text="First Page (WITH Lifecycle Management)" VerticalOptions="Center" HorizontalOptions="Center" FontSize="Large" />
+</pages:ContentPageWithLifecycle>

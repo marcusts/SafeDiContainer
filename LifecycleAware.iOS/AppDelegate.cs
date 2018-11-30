@@ -1,21 +1,19 @@
-﻿#region License
-
-// MIT License
-// 
-// Copyright (c) 2018 
+﻿// MIT License
+//
+// Copyright (c) 2018
 // Marcus Technical Services, Inc.
 // http://www.marcusts.com
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,12 +22,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#endregion
-
 namespace LifecycleAware.iOS
 {
-   #region Imports
-
    using System.Diagnostics;
    using Forms;
    using Foundation;
@@ -39,20 +33,18 @@ namespace LifecycleAware.iOS
    using Xamarin.Forms;
    using Xamarin.Forms.Platform.iOS;
 
-   #endregion
-
-   // The UIApplicationDelegate for the application. This class is responsible for launching the 
-   // User Interface of the application, as well as listening (and optionally responding) to 
+   // The UIApplicationDelegate for the application. This class is responsible for launching the
+   // User Interface of the application, as well as listening (and optionally responding) to
    // application events from iOS.
    [Register(nameof(AppDelegate))]
    public class AppDelegate : FormsApplicationDelegate
    {
-      #region Private Variables
+      #region Private Fields
 
       private float _oldScreenHeight;
       private float _oldScreenWidth;
 
-      #endregion Private Variables
+      #endregion Private Fields
 
       #region Public Methods
 
@@ -86,9 +78,9 @@ namespace LifecycleAware.iOS
          // when the window size changes.
          var notificationCenter = NSNotificationCenter.DefaultCenter;
          notificationCenter.AddObserver(UIApplication.DidChangeStatusBarOrientationNotification,
-            ConsiderPossibleSizeOrOrientationChange);
+           ConsiderPossibleSizeOrOrientationChange);
          notificationCenter.AddObserver(UIApplication.DidChangeStatusBarFrameNotification,
-            ConsiderPossibleSizeOrOrientationChange);
+           ConsiderPossibleSizeOrOrientationChange);
 
          UIDevice.CurrentDevice.BeginGeneratingDeviceOrientationNotifications();
 
@@ -96,7 +88,7 @@ namespace LifecycleAware.iOS
          //if (options.IsNotEmpty())
          //   Device.BeginInvokeOnMainThread
          //   (
-         //      async () => { await ProcessNotification(options, false, true); }
+         //     async () => { await ProcessNotification(options, false, true); }
          //   );
 
          return base.FinishedLaunching(app, options);
@@ -107,13 +99,11 @@ namespace LifecycleAware.iOS
       //------------------------------------------------------------------------------------------
 
       //------------------------------------------------------------------------------------------
-      public override void OnActivated(UIApplication app)
-      {
-         // Restart any tasks that were paused (or not yet started) while the application was
-         // inactive. If the application was previously in the background, optionally refresh the
-         // user interface.
-         Debug.WriteLine("IOS: on activated");
-      }
+      public override void OnActivated(UIApplication app) =>
+        // Restart any tasks that were paused (or not yet started) while the application was
+        // inactive. If the application was previously in the background, optionally refresh the
+        // user interface.
+        Debug.WriteLine("IOS: on activated");
 
       //------------------------------------------------------------------------------------------
       public override void OnResignActivation(UIApplication app)
@@ -126,12 +116,10 @@ namespace LifecycleAware.iOS
 
       //------------------------------------------------------------------------------------------
       public override bool OpenUrl(UIApplication application, NSUrl url, string sourceApplication,
-         NSObject annotation)
-      {
-         // Debug.WriteLine( url );
-         /* now store the url somewhere in the appâ€™s context. The url is in the url NSUrl object. The data is in url.Host if the link as a scheme as superduperapp://something_interesting */
-         return false;
-      }
+        NSObject annotation) =>
+        // Debug.WriteLine( url );
+        /* now store the url somewhere in the appâ€™s context. The url is in the url NSUrl object. The data is in url.Host if the link as a scheme as superduperapp://something_interesting */
+        false;
 
       public override void ReceivedLocalNotification(UIApplication application, UILocalNotification notification)
       {
@@ -149,12 +137,10 @@ namespace LifecycleAware.iOS
       }
 
       //------------------------------------------------------------------------------------------
-      public override void WillEnterForeground(UIApplication app)
-      {
-         // Called as part of the transition from background to active state. Here you can undo many
-         // of the changes made on entering the background.
-         Debug.WriteLine("IOS: About to enter the foreground");
-      }
+      public override void WillEnterForeground(UIApplication app) =>
+        // Called as part of the transition from background to active state. Here you can undo many
+        // of the changes made on entering the background.
+        Debug.WriteLine("IOS: About to enter the foreground");
 
       #endregion Public Methods
 
@@ -164,10 +150,7 @@ namespace LifecycleAware.iOS
       /// Devices the orientation did change.
       /// </summary>
       /// <param name="notification">Notification.</param>
-      private void ConsiderPossibleSizeOrOrientationChange(NSNotification notification)
-      {
-         SetScreenSizeAndOrientation();
-      }
+      private void ConsiderPossibleSizeOrOrientationChange(NSNotification notification) => SetScreenSizeAndOrientation();
 
       private void SetScreenSizeAndOrientation()
       {

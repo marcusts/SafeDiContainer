@@ -35,13 +35,13 @@ namespace SharedForms.ViewModels.Samples
    [DoNotNotify]
    public class AboutViewModel : PageViewModelBase
    {
-      #region Public Constructors
+     #region Public Constructors
 
-      public AboutViewModel(IStateMachineBase stateMachine, IProvidePageEvents pageEventProvider = null) : base(
-         stateMachine, pageEventProvider)
-      {
-      }
+     public AboutViewModel(IStateMachineBase stateMachine, IProvidePageEvents pageEventProvider = null) : base(
+       stateMachine, pageEventProvider)
+     {
+     }
 
-      #endregion Public Constructors
+     #endregion Public Constructors
    }
 }

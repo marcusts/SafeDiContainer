@@ -31,25 +31,25 @@ namespace SharedForms.Common.Utils
 
    public static class FormsExtensions
    {
-      #region Public Methods
+     #region Public Methods
 
-      public static bool IsDifferentThan(this Rectangle mainRect, Rectangle otherRect)
-      {
-         return !mainRect.IsSameAs(otherRect);
-      }
+     public static bool IsDifferentThan(this Rectangle mainRect, Rectangle otherRect)
+     {
+       return !mainRect.IsSameAs(otherRect);
+     }
 
-      public static bool IsSameAs(this Rectangle mainRect, Rectangle otherRect)
-      {
-         return
-            mainRect.Width.IsSameAs(otherRect.Width)
-            &&
-            mainRect.Height.IsSameAs(otherRect.Height)
-            &&
-            mainRect.X.IsSameAs(otherRect.X)
-            &&
-            mainRect.Y.IsSameAs(otherRect.Y);
-      }
+     public static bool IsSameAs(this Rectangle mainRect, Rectangle otherRect)
+     {
+       return
+         mainRect.Width.IsSameAs(otherRect.Width)
+         &&
+         mainRect.Height.IsSameAs(otherRect.Height)
+         &&
+         mainRect.X.IsSameAs(otherRect.X)
+         &&
+         mainRect.Y.IsSameAs(otherRect.Y);
+     }
 
-      #endregion Public Methods
+     #endregion Public Methods
    }
 }

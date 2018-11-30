@@ -25,12 +25,12 @@ namespace SharedForms.Common.Utils
 {
    public static class GlobalConstants
    {
-      #region Public Variables
+     #region Public Variables
 
-      public const double TOOL_BAR_BUTTON_CORNER_RADIUS_FACTOR = 0.1;
+     public const double TOOL_BAR_BUTTON_CORNER_RADIUS_FACTOR = 0.1;
 
-      public static int NEXT_SELECTION_GROUP;
+     public static int NEXT_SELECTION_GROUP;
 
-      #endregion Public Variables
+     #endregion Public Variables
    }
 }

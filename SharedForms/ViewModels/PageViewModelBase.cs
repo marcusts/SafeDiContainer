@@ -36,79 +36,79 @@ namespace SharedForms.ViewModels
    [DoNotNotify]
    public abstract class PageViewModelBase : IPageViewModelBase
    {
-      #region Protected Variables
+     #region Protected Variables
 
-      protected readonly IStateMachineBase Machine;
+     protected readonly IStateMachineBase Machine;
 
-      #endregion Protected Variables
+     #endregion Protected Variables
 
-      #region Protected Constructors
+     #region Protected Constructors
 
-      protected PageViewModelBase(IStateMachineBase stateMachine, IProvidePageEvents pageEventProvider = null)
-      {
-         // Request the global interface type so the code is more share-able.
-         Machine = stateMachine;
+     protected PageViewModelBase(IStateMachineBase stateMachine, IProvidePageEvents pageEventProvider = null)
+     {
+       // Request the global interface type so the code is more share-able.
+       Machine = stateMachine;
 
-         // Also share the page event provider so that derivers know about OnAppearing,
-         // OnDisappearing, etc.
-         PageEventProvider = pageEventProvider;
+       // Also share the page event provider so that derivers know about OnAppearing,
+       // OnDisappearing, etc.
+       PageEventProvider = pageEventProvider;
 
-         if (PageEventProvider?.GetEventBroadcaster != null)
-         {
-            FormsMessengerUtils.Subscribe<PageLifecycleMessage>(this, HandlePageLifecycleChanged);
-         }
-      }
+       if (PageEventProvider?.GetEventBroadcaster != null)
+       {
+         FormsMessengerUtils.Subscribe<PageLifecycleMessage>(this, HandlePageLifecycleChanged);
+       }
+     }
 
-      #endregion Protected Constructors
+     #endregion Protected Constructors
 
-      #region Protected Methods
+     #region Protected Methods
 
-      /// <summary>
-      /// Make this page lifecycle event visible to derivers
-      /// </summary>
-      /// <param name="args"></param>
-      protected virtual void OnPageLifecycleChanged(IPageLifecycleMessageArgs args)
-      {
-      }
+     /// <summary>
+     /// Make this page lifecycle event visible to derivers
+     /// </summary>
+     /// <param name="args"></param>
+     protected virtual void OnPageLifecycleChanged(IPageLifecycleMessageArgs args)
+     {
+     }
 
-      #endregion Protected Methods
+     #endregion Protected Methods
 
-      #region Private Methods
+     #region Private Methods
 
-      private void HandlePageLifecycleChanged(object sender, PageLifecycleMessage args)
-      {
-         // Make sure the sender is our page
-         if (!sender.IsAnEqualReferenceTo(PageEventProvider?.GetEventBroadcaster?.Invoke()))
-         {
-            return;
-         }
+     private void HandlePageLifecycleChanged(object sender, PageLifecycleMessage args)
+     {
+       // Make sure the sender is our page
+       if (!sender.IsAnEqualReferenceTo(PageEventProvider?.GetEventBroadcaster?.Invoke()))
+       {
+         return;
+       }
 
-         OnPageLifecycleChanged(args.Payload);
-      }
+       OnPageLifecycleChanged(args.Payload);
+     }
 
-      #endregion Private Methods
+     #endregion Private Methods
 
-      #region Public Properties
+     #region Public Properties
 
-      public IProvidePageEvents PageEventProvider { get; set; }
+     public IProvidePageEvents PageEventProvider { get; set; }
 
-      /// <summary>
-      /// Copied from the menu item to this page (at least for now)
-      /// </summary>
-      public string PageTitle { get; set; }
+     /// <summary>
+     /// Copied from the menu item to this page (at least for now)
+     /// </summary>
+     public string PageTitle { get; set; }
 
-      #endregion Public Properties
+     #endregion Public Properties
    }
 
    public interface IPageViewModelBase : IViewModelBase, IReceivePageEvents
    {
-      #region Public Properties
+     #region Public Properties
 
-      /// <summary>
-      /// Copied from the menu item to this page (at least for now)
-      /// </summary>
-      string PageTitle { get; set; }
+     /// <summary>
+     /// Copied from the menu item to this page (at least for now)
+     /// </summary>
+     string PageTitle { get; set; }
 
-      #endregion Public Properties
+     #endregion Public Properties
    }
 }

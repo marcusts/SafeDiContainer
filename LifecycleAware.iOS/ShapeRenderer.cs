@@ -1,21 +1,19 @@
-﻿#region License
-
-// MIT License
-// 
-// Copyright (c) 2018 
+﻿// MIT License
+//
+// Copyright (c) 2018
 // Marcus Technical Services, Inc.
 // http://www.marcusts.com
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,22 +22,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#endregion
-
-#region Imports
-
 using LifecycleAware.iOS;
 using SharedForms.Views.Controls;
 using Xamarin.Forms;
-
-#endregion
 
 [assembly: ExportRenderer(typeof(ShapeView), typeof(ShapeRenderer))]
 
 namespace LifecycleAware.iOS
 {
-   #region Imports
-
    using System;
    using System.Collections.Generic;
    using System.ComponentModel;
@@ -50,38 +40,13 @@ namespace LifecycleAware.iOS
    using UIKit;
    using Xamarin.Forms.Platform.iOS;
 
-   #endregion
-
    public class ShapeRenderer : VisualElementRenderer<ShapeView>
    {
       #region Public Constructors
 
-      public ShapeRenderer()
-      {
-         ContentMode = UIViewContentMode.Redraw;
-      }
+      public ShapeRenderer() => ContentMode = UIViewContentMode.Redraw;
 
       #endregion Public Constructors
-
-      #region Private Methods
-
-      private static void DrawPath(CGContext context, bool fill, bool stroke)
-      {
-         if (fill && stroke)
-         {
-            context.DrawPath(CGPathDrawingMode.FillStroke);
-         }
-         else if (fill)
-         {
-            context.DrawPath(CGPathDrawingMode.Fill);
-         }
-         else if (stroke)
-         {
-            context.DrawPath(CGPathDrawingMode.Stroke);
-         }
-      }
-
-      #endregion Private Methods
 
       #region Public Methods
 
@@ -96,12 +61,12 @@ namespace LifecycleAware.iOS
       {
          base.Draw(rect);
 
-         var x = (float) (rect.X + Element.Padding.Left);
-         var y = (float) (rect.Y + Element.Padding.Top);
-         var width = (float) (rect.Width - Element.Padding.HorizontalThickness);
-         var height = (float) (rect.Height - Element.Padding.VerticalThickness);
-         var cx = (float) (width / 2f + Element.Padding.Left);
-         var cy = (float) (height / 2f + Element.Padding.Top);
+         var x = (float)(rect.X + Element.Padding.Left);
+         var y = (float)(rect.Y + Element.Padding.Top);
+         var width = (float)(rect.Width - Element.Padding.HorizontalThickness);
+         var height = (float)(rect.Height - Element.Padding.VerticalThickness);
+         var cx = (float)(width / 2f + Element.Padding.Left);
+         var cy = (float)(height / 2f + Element.Padding.Top);
 
          var context = UIGraphics.GetCurrentContext();
 
@@ -151,17 +116,17 @@ namespace LifecycleAware.iOS
                var innerRadius = outerRadius * Element.RadiusRatio;
 
                DrawStar(context, cx, cy, outerRadius, innerRadius, Element.NumberOfPoints, Element.CornerRadius, fill,
-                  stroke);
+                 stroke);
                break;
 
             case ShapeType.Triangle:
                DrawTriangle(context, x + strokeWidth / 2, y + strokeWidth / 2, width - strokeWidth,
-                  height - strokeWidth, Element.CornerRadius, fill, stroke);
+                 height - strokeWidth, Element.CornerRadius, fill, stroke);
                break;
 
             case ShapeType.Diamond:
                DrawDiamond(context, x + strokeWidth / 2, y + strokeWidth / 2, width - strokeWidth, height - strokeWidth,
-                  Element.CornerRadius, fill, stroke);
+                 Element.CornerRadius, fill, stroke);
                break;
 
             case ShapeType.Heart:
@@ -201,7 +166,7 @@ namespace LifecycleAware.iOS
 
             case ShapeType.Path:
                DrawPoints(context, Element.Points.Select(p => p.ToCGPoint()).ToList(),
-                  Element.CornerRadius, fill, stroke, x, y);
+                 Element.CornerRadius, fill, stroke, x, y);
                break;
          }
       }
@@ -211,7 +176,7 @@ namespace LifecycleAware.iOS
       #region Protected Methods
 
       protected virtual void DrawBox(CGContext context, float x, float y, float width, float height, float cornerRadius,
-         bool fill, bool stroke)
+       bool fill, bool stroke)
       {
          var rect = new RectangleF(x, y, width, height);
          if (cornerRadius > 0)
@@ -228,29 +193,29 @@ namespace LifecycleAware.iOS
 
       protected virtual void DrawCircle(CGContext context, float cx, float cy, float radius, bool fill, bool stroke)
       {
-         context.AddArc(cx, cy, radius, 0, (float) Math.PI * 2, true);
+         context.AddArc(cx, cy, radius, 0, (float)Math.PI * 2, true);
          DrawPath(context, fill, stroke);
       }
 
       protected virtual void DrawDiamond(CGContext context, float x, float y, float width, float height,
-         float cornerRadius, bool fill, bool stroke)
+       float cornerRadius, bool fill, bool stroke)
       {
          var centerX = width / 2f + x;
          var centerY = height / 2f + y;
 
          var points = new List<CGPoint>
-         {
-            new CGPoint(x, centerY),
-            new CGPoint(centerX, y),
-            new CGPoint(x + width, centerY),
-            new CGPoint(centerX, height + y)
-         };
+       {
+         new CGPoint(x, centerY),
+         new CGPoint(centerX, y),
+         new CGPoint(x + width, centerY),
+         new CGPoint(centerX, height + y)
+       };
 
          DrawPoints(context, points, cornerRadius, fill, stroke);
       }
 
       protected virtual void DrawHeart(CGContext context, float x, float y, float width, float height,
-         float cornerRadius, bool fill, bool stroke)
+       float cornerRadius, bool fill, bool stroke)
       {
          var length = Math.Min(height, width);
 
@@ -267,12 +232,12 @@ namespace LifecycleAware.iOS
 
          path.AddArcToPoint(p1.X, p1.Y, p2.X, p2.Y, cornerRadius);
          path.AddLineToPoint(p2.X, p2.Y);
-         path.AddArc(c1.X, c1.Y, radius, (float) -Math.PI / 2f, (float) Math.PI / 2f, false);
-         path.AddArc(c2.X, c2.Y, radius, 0f, (float) Math.PI, true);
+         path.AddArc(c1.X, c1.Y, radius, (float)-Math.PI / 2f, (float)Math.PI / 2f, false);
+         path.AddArc(c2.X, c2.Y, radius, 0f, (float)Math.PI, true);
          path.CloseSubpath();
 
          var transform = CGAffineTransform.MakeTranslation(-length / 3f, -length * 2f / 3f);
-         transform.Rotate((float) -Math.PI / 4f);
+         transform.Rotate((float)-Math.PI / 4f);
          transform.Scale(0.85f, 0.85f);
          transform.Translate(width / 2f, 1.1f * height / 2f);
          path = path.CopyByTransformingPath(transform);
@@ -282,14 +247,14 @@ namespace LifecycleAware.iOS
       }
 
       protected virtual void DrawOval(CGContext context, float x, float y, float width, float height, bool fill,
-         bool stroke)
+       bool stroke)
       {
          context.AddEllipseInRect(new RectangleF(x, y, width, height));
          DrawPath(context, fill, stroke);
       }
 
       protected virtual void DrawPoints(CGContext context, List<CGPoint> points, float cornerRadius, bool fill,
-         bool stroke, float x = 0f, float y = 0f)
+       bool stroke, float x = 0f, float y = 0f)
       {
          if (points == null || points.Count == 0)
          {
@@ -318,15 +283,15 @@ namespace LifecycleAware.iOS
       }
 
       protected virtual void DrawProgressCircle(CGContext context, float cx, float cy, float radius, float progress,
-         bool fill, bool stroke)
+       bool fill, bool stroke)
       {
-         context.AddArc(cx, cy, radius, (float) -Math.PI / 2f, (float) (2f * Math.PI * progress / 100f - Math.PI / 2f),
-            false);
+         context.AddArc(cx, cy, radius, (float)-Math.PI / 2f, (float)(2f * Math.PI * progress / 100f - Math.PI / 2f),
+           false);
          DrawPath(context, fill, stroke);
       }
 
       protected virtual void DrawStar(CGContext context, float x, float y, float outerRadius, float innerRadius,
-         int numberOfPoints, float cornerRadius, bool fill, bool stroke)
+       int numberOfPoints, float cornerRadius, bool fill, bool stroke)
       {
          if (numberOfPoints <= 0)
          {
@@ -344,8 +309,8 @@ namespace LifecycleAware.iOS
             var currentRadius = isOuter ? innerRadius : outerRadius;
             isOuter = !isOuter;
 
-            var xPath = (float) (currentRadius * Math.Sin(ba)) + x;
-            var yPath = (float) (currentRadius * Math.Cos(ba)) + y;
+            var xPath = (float)(currentRadius * Math.Sin(ba)) + x;
+            var yPath = (float)(currentRadius * Math.Cos(ba)) + y;
 
             points.Add(new CGPoint(xPath, yPath));
 
@@ -356,14 +321,14 @@ namespace LifecycleAware.iOS
       }
 
       protected virtual void DrawTriangle(CGContext context, float x, float y, float width, float height,
-         float cornerRadius, bool fill, bool stroke)
+       float cornerRadius, bool fill, bool stroke)
       {
          var points = new List<CGPoint>
-         {
-            new CGPoint(x, y + height),
-            new CGPoint(x + width / 2, y),
-            new CGPoint(x + width, y + height)
-         };
+       {
+         new CGPoint(x, y + height),
+         new CGPoint(x + width / 2, y),
+         new CGPoint(x + width, y + height)
+       };
 
          DrawPoints(context, points, cornerRadius, fill, stroke);
       }
@@ -394,5 +359,25 @@ namespace LifecycleAware.iOS
       }
 
       #endregion Protected Methods
+
+      #region Private Methods
+
+      private static void DrawPath(CGContext context, bool fill, bool stroke)
+      {
+         if (fill && stroke)
+         {
+            context.DrawPath(CGPathDrawingMode.FillStroke);
+         }
+         else if (fill)
+         {
+            context.DrawPath(CGPathDrawingMode.Fill);
+         }
+         else if (stroke)
+         {
+            context.DrawPath(CGPathDrawingMode.Stroke);
+         }
+      }
+
+      #endregion Private Methods
    }
 }

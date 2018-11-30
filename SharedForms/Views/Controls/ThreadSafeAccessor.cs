@@ -31,47 +31,47 @@ namespace SharedForms.Views.Controls
 
    public class ThreadSafeAccessor : IThreadSafeAccessor
    {
-      #region Private Variables
+     #region Private Variables
 
-      private object _storedValue;
+     private object _storedValue;
 
-      #endregion Private Variables
+     #endregion Private Variables
 
-      #region Public Constructors
+     #region Public Constructors
 
-      public ThreadSafeAccessor(object storedValue = null)
-      {
-         if (storedValue != null)
-         {
-            WriteStoredValue(storedValue);
-         }
-      }
+     public ThreadSafeAccessor(object storedValue = null)
+     {
+       if (storedValue != null)
+       {
+         WriteStoredValue(storedValue);
+       }
+     }
 
-      #endregion Public Constructors
+     #endregion Public Constructors
 
-      #region Public Methods
+     #region Public Methods
 
-      public object ReadStoredValue()
-      {
-         return Interlocked.CompareExchange(ref _storedValue, 0, 0);
-      }
+     public object ReadStoredValue()
+     {
+       return Interlocked.CompareExchange(ref _storedValue, 0, 0);
+     }
 
-      public void WriteStoredValue(object valueToStore)
-      {
-         Interlocked.Exchange(ref _storedValue, valueToStore);
-      }
+     public void WriteStoredValue(object valueToStore)
+     {
+       Interlocked.Exchange(ref _storedValue, valueToStore);
+     }
 
-      #endregion Public Methods
+     #endregion Public Methods
    }
 
    public interface IThreadSafeAccessor
    {
-      #region Public Methods
+     #region Public Methods
 
-      object ReadStoredValue();
+     object ReadStoredValue();
 
-      void WriteStoredValue(object valueToStore);
+     void WriteStoredValue(object valueToStore);
 
-      #endregion Public Methods
+     #endregion Public Methods
    }
 }

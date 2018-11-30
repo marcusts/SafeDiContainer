@@ -42,114 +42,114 @@ namespace SharedForms.Views.Pages
    /// page rather than a view.
    /// </remarks>
    public abstract class TypeSafePageBase<InterfaceT> : ContentPage, ITypeSafePageBase
-      where InterfaceT : class
+     where InterfaceT : class
    {
-      #region Private Variables
+     #region Private Variables
 
-      private readonly RelativeLayout _contentRelativeLayout = FormsUtils.GetExpandingRelativeLayout();
+     private readonly RelativeLayout _contentRelativeLayout = FormsUtils.GetExpandingRelativeLayout();
 
-      #endregion Private Variables
+     #endregion Private Variables
 
-      #region Protected Constructors
+     #region Protected Constructors
 
-      protected TypeSafePageBase()
-      {
-         NavigationPage.SetHasNavigationBar(this, false);
-         BackgroundColor = Color.Transparent;
+     protected TypeSafePageBase()
+     {
+       NavigationPage.SetHasNavigationBar(this, false);
+       BackgroundColor = Color.Transparent;
 
-         ConstructTypeSafePageView();
-      }
+       ConstructTypeSafePageView();
+     }
 
-      #endregion Protected Constructors
+     #endregion Protected Constructors
 
-      #region Private Methods
+     #region Private Methods
 
-      /// <summary>
-      /// We create an "is busy" view by default so it is always available. We insert the deriver's
-      /// content below this is busy view.
-      /// </summary>
-      private void ConstructTypeSafePageView()
-      {
-         FormsMessengerUtils.Send(new PageLifecycleMessage(this, PageLifecycleEvents.BeforeConstructing));
+     /// <summary>
+     /// We create an "is busy" view by default so it is always available. We insert the deriver's
+     /// content below this is busy view.
+     /// </summary>
+     private void ConstructTypeSafePageView()
+     {
+       FormsMessengerUtils.Send(new PageLifecycleMessage(this, PageLifecycleEvents.BeforeConstructing));
 
-         try
-         {
-            var derivedView = ConstructPageView();
+       try
+       {
+         var derivedView = ConstructPageView();
 
-            _contentRelativeLayout.CreateRelativeOverlay(derivedView);
+         _contentRelativeLayout.CreateRelativeOverlay(derivedView);
 
-            Content = _contentRelativeLayout;
+         Content = _contentRelativeLayout;
 
-            // Notify derivers of this final step
-            AfterContentSet(_contentRelativeLayout);
-         }
-         catch (Exception ex)
-         {
-            Debug.WriteLine("TYPE SAFE PAGE BASE: ConstructTypeSafePageView: ERROR ->" + ex.Message + "<-");
-         }
-         finally
-         {
-            FormsMessengerUtils.Send(new PageLifecycleMessage(this, PageLifecycleEvents.AfterConstructing));
-         }
-      }
+         // Notify derivers of this final step
+         AfterContentSet(_contentRelativeLayout);
+       }
+       catch (Exception ex)
+       {
+         Debug.WriteLine("TYPE SAFE PAGE BASE: ConstructTypeSafePageView: ERROR ->" + ex.Message + "<-");
+       }
+       finally
+       {
+         FormsMessengerUtils.Send(new PageLifecycleMessage(this, PageLifecycleEvents.AfterConstructing));
+       }
+     }
 
-      #endregion Private Methods
+     #endregion Private Methods
 
-      #region Public Properties
+     #region Public Properties
 
-      /// <summary>
-      /// InterfaceT is cast to the base to make it type-safe.
-      /// NOTE: This hides the base BindingContext.
-      /// </summary>
-      public new InterfaceT BindingContext
-      {
-         get => base.BindingContext as InterfaceT;
-         set => base.BindingContext = value;
-      }
+     /// <summary>
+     /// InterfaceT is cast to the base to make it type-safe.
+     /// NOTE: This hides the base BindingContext.
+     /// </summary>
+     public new InterfaceT BindingContext
+     {
+       get => base.BindingContext as InterfaceT;
+       set => base.BindingContext = value;
+     }
 
-      public Func<object> GetEventBroadcaster => () => this;
+     public Func<object> GetEventBroadcaster => () => this;
 
-      #endregion Public Properties
+     #endregion Public Properties
 
-      #region Protected Methods
+     #region Protected Methods
 
-      protected virtual void AfterContentSet(RelativeLayout layout)
-      {
-      }
+     protected virtual void AfterContentSet(RelativeLayout layout)
+     {
+     }
 
-      /// <summary>
-      /// Requests that the deriver create the physical view.
-      /// </summary>
-      /// <returns></returns>
-      protected abstract View ConstructPageView();
+     /// <summary>
+     /// Requests that the deriver create the physical view.
+     /// </summary>
+     /// <returns></returns>
+     protected abstract View ConstructPageView();
 
-      /// <summary>
-      /// Called when the page appears.
-      /// </summary>
-      protected override void OnAppearing()
-      {
-         FormsMessengerUtils.Send(new PageLifecycleMessage(this, PageLifecycleEvents.BeforeAppearing));
+     /// <summary>
+     /// Called when the page appears.
+     /// </summary>
+     protected override void OnAppearing()
+     {
+       FormsMessengerUtils.Send(new PageLifecycleMessage(this, PageLifecycleEvents.BeforeAppearing));
 
-         base.OnAppearing();
+       base.OnAppearing();
 
-         FormsMessengerUtils.Send(new PageLifecycleMessage(this, PageLifecycleEvents.AfterAppearing));
-      }
+       FormsMessengerUtils.Send(new PageLifecycleMessage(this, PageLifecycleEvents.AfterAppearing));
+     }
 
-      protected override void OnDisappearing()
-      {
-         FormsMessengerUtils.Send(new PageLifecycleMessage(this, PageLifecycleEvents.BeforeDisappearing));
+     protected override void OnDisappearing()
+     {
+       FormsMessengerUtils.Send(new PageLifecycleMessage(this, PageLifecycleEvents.BeforeDisappearing));
 
-         base.OnDisappearing();
+       base.OnDisappearing();
 
-         FormsMessengerUtils.Send(new PageLifecycleMessage(this, PageLifecycleEvents.AfterDisappearing));
-      }
+       FormsMessengerUtils.Send(new PageLifecycleMessage(this, PageLifecycleEvents.AfterDisappearing));
+     }
 
-      #endregion Protected Methods
+     #endregion Protected Methods
    }
 
    /// <remarks>
    /// WARNING: .Net does not provide an IContentPage interface, so we cannot reference the page from
-   ///          this interface without a hard cast!
+   ///        this interface without a hard cast!
    /// </remarks>
    public interface ITypeSafePageBase : IProvidePageEvents
    {

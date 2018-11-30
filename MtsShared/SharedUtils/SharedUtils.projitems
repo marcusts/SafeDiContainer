@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>777ae3b8-6c36-4744-9d1a-ac2082e4f8ec</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>SharedUtils</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IHaveButtonState.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IHavePageViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IMenuNavigationState.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IProvidePageEvents.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IReceivePageEvents.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Navigation\NoPayload.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\EventUtils.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\Extensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\GlobalConstants.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\ThreadHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\WeakEventManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\FlexibleStack.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\ThreadSafeAccessor.cs" />
+  </ItemGroup>
+</Project>

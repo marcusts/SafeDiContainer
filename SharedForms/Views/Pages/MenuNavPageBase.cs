@@ -46,198 +46,198 @@ namespace SharedForms.Views.Pages
 
    public interface IMenuNavPageBase : ITypeSafePageBase
    {
-      #region Public Methods
+     #region Public Methods
 
-      void RemoveMenuFromLayout();
+     void RemoveMenuFromLayout();
 
-      #endregion Public Methods
+     #endregion Public Methods
    }
 
    /// <summary>
-   ///    A page with a navigation header.
+   ///   A page with a navigation header.
    /// </summary>
    [AddINotifyPropertyChangedInterface]
    public abstract class MenuNavPageBase<InterfaceT> : TypeSafePageBase<InterfaceT>, IMenuNavPageBase
-      where InterfaceT : class, IPageViewModelBase
+     where InterfaceT : class, IPageViewModelBase
    {
-      #region Public Constructors
+     #region Public Constructors
 
 #if STORE_PAGE_MENU_STATICALLY
-      static MenuNavPageBase()
-      {
-         var stateMachine = AppContainer.GlobalVariableContainer.Resolve<IStateMachineBase>();
-         PageMenu = new MainMenu(stateMachine);
-      }
+     static MenuNavPageBase()
+     {
+       var stateMachine = AppContainer.GlobalVariableContainer.Resolve<IStateMachineBase>();
+       PageMenu = new MainMenu(stateMachine);
+     }
 #endif
 
-      #endregion Public Constructors
+     #endregion Public Constructors
 
-      #region Protected Constructors
+     #region Protected Constructors
 
-      protected MenuNavPageBase()
-      {
-         // Do not use "BeginLifetimeScope" because it does not seem to work. Also, the menu is
-         // global for the life of the app.
+     protected MenuNavPageBase()
+     {
+       // Do not use "BeginLifetimeScope" because it does not seem to work. Also, the menu is
+       // global for the life of the app.
 #if !STORE_PAGE_MENU_STATICALLY
-         // PageMenu = AppContainer.GlobalVariableContainer.Resolve<IMainMenu>();
-         PageMenu = new MainMenu(null);
+       // PageMenu = AppContainer.GlobalVariableContainer.Resolve<IMainMenu>();
+       PageMenu = new MainMenu(null);
 #endif
 
-         FormsMessengerUtils.Subscribe<NavBarMenuTappedMessage>(this, OnMainMenuItemSelected);
+       FormsMessengerUtils.Subscribe<NavBarMenuTappedMessage>(this, OnMainMenuItemSelected);
 
-         BackgroundColor = Color.Transparent;
+       BackgroundColor = Color.Transparent;
 
-         PageMenuView.Opacity = 0;
+       PageMenuView.Opacity = 0;
 
-         var controlTemplateNotSet = true;
+       var controlTemplateNotSet = true;
 
-         BindingContextChanged +=
-            (sender, args) =>
+       BindingContextChanged +=
+         (sender, args) =>
+         {
+            if (controlTemplateNotSet)
             {
-               if (controlTemplateNotSet)
-               {
-                  ControlTemplate = Application.Current.Resources[NAV_BAR_CONTROL_TEMPLATE] as ControlTemplate;
-                  controlTemplateNotSet = false;
-               }
-            };
+              ControlTemplate = Application.Current.Resources[NAV_BAR_CONTROL_TEMPLATE] as ControlTemplate;
+              controlTemplateNotSet = false;
+            }
+         };
 
-         _canvas.InputTransparent = true;
-      }
+       _canvas.InputTransparent = true;
+     }
 
-      #endregion Protected Constructors
+     #endregion Protected Constructors
 
-      #region Public Methods
+     #region Public Methods
 
-      public void RemoveMenuFromLayout()
-      {
-         if (_canvas != null && _canvas.Children.Contains(PageMenuView))
-         {
-            _canvas.Children.Remove(PageMenuView);
-         }
-      }
+     public void RemoveMenuFromLayout()
+     {
+       if (_canvas != null && _canvas.Children.Contains(PageMenuView))
+       {
+         _canvas.Children.Remove(PageMenuView);
+       }
+     }
 
-      #endregion Public Methods
+     #endregion Public Methods
 
-      #region Private Variables
+     #region Private Variables
 
-      private const int MENU_ANIMATE_MILLISECONDS = 400;
+     private const int MENU_ANIMATE_MILLISECONDS = 400;
 
-      private const int MENU_FADE_MILLISECONDS = 200;
+     private const int MENU_FADE_MILLISECONDS = 200;
 
-      private const string NAV_BAR_CONTROL_TEMPLATE = "NavBarControlTemplate";
+     private const string NAV_BAR_CONTROL_TEMPLATE = "NavBarControlTemplate";
 
-      private readonly AbsoluteLayout _canvas = FormsUtils.GetExpandingAbsoluteLayout();
+     private readonly AbsoluteLayout _canvas = FormsUtils.GetExpandingAbsoluteLayout();
 
-      private volatile bool _isPageMenuShowing;
+     private volatile bool _isPageMenuShowing;
 
-      #endregion Private Variables
+     #endregion Private Variables
 
-      #region Protected Properties
+     #region Protected Properties
 
-      protected
+     protected
 #if STORE_PAGE_MENU_STATICALLY
-         static
+       static
 #endif
-         IMainMenu PageMenu { get; set; }
+       IMainMenu PageMenu { get; set; }
 
-      protected bool IsPageMenuShowing
-      {
-         get => _isPageMenuShowing;
-         set
-         {
-            Device.BeginInvokeOnMainThread
+     protected bool IsPageMenuShowing
+     {
+       get => _isPageMenuShowing;
+       set
+       {
+         Device.BeginInvokeOnMainThread
+         (
+            async () =>
+            {
+              _isPageMenuShowing = value;
+
+              await AnimatePageMenu().WithoutChangingContext();
+
+              // HACK to fix dead UI in the main menu, which sits on top of this canvas
+              _canvas.InputTransparent = !_isPageMenuShowing;
+            }
+         );
+       }
+     }
+
+     protected View PageMenuView => PageMenu as View;
+
+     #endregion Protected Properties
+
+     #region Protected Methods
+
+     protected override void AfterContentSet(RelativeLayout layout)
+     {
+       // No need to add it twice
+       if (_canvas == null || _canvas.Children.Contains(PageMenuView))
+       {
+         return;
+       }
+
+       PageMenuView.Opacity = 0;
+
+       var targetRect = CreateOfflineRectangle();
+
+       layout.CreateRelativeOverlay(_canvas);
+
+       // A slight cheat; using protected property
+       _canvas.Children.Add(PageMenuView, targetRect);
+     }
+
+     protected override void OnDisappearing()
+     {
+       base.OnDisappearing();
+
+       FormsMessengerUtils.Unsubscribe<NavBarMenuTappedMessage>(this);
+
+       RemoveMenuFromLayout();
+     }
+
+     #endregion Protected Methods
+
+     #region Private Methods
+
+     private Rectangle CreateOfflineRectangle()
+     {
+       return new Rectangle(OrientationService.ScreenWidth, 0, 0, PageMenu.MenuHeight);
+     }
+
+     /// <summary>
+     ///   Animates the panel in our out depending on the state
+     /// </summary>
+     private async Task AnimatePageMenu()
+     {
+       if (IsPageMenuShowing)
+       {
+         // Slide the menu up from the bottom
+         var rect =
+            new Rectangle
             (
-               async () =>
-               {
-                  _isPageMenuShowing = value;
-
-                  await AnimatePageMenu().WithoutChangingContext();
-
-                  // HACK to fix dead UI in the main menu, which sits on top of this canvas
-                  _canvas.InputTransparent = !_isPageMenuShowing;
-               }
+              Width - MainMenu.MENU_GROSS_WIDTH,
+              0,
+              MainMenu.MENU_GROSS_WIDTH,
+              PageMenu.MenuHeight
             );
-         }
-      }
 
-      protected View PageMenuView => PageMenu as View;
+         await Task.WhenAll(PageMenuView.LayoutTo(rect, MENU_ANIMATE_MILLISECONDS, Easing.CubicIn),
+            PageMenuView.FadeTo(1.0, MENU_FADE_MILLISECONDS)).WithoutChangingContext();
+       }
+       else
+       {
+         // Retract the menu
+         var rect = CreateOfflineRectangle();
 
-      #endregion Protected Properties
+         await Task.WhenAll(PageMenuView.LayoutTo(rect, MENU_ANIMATE_MILLISECONDS, Easing.CubicOut),
+            PageMenuView.FadeTo(0.0, MENU_FADE_MILLISECONDS)).WithoutChangingContext();
+       }
+     }
 
-      #region Protected Methods
+     private void OnMainMenuItemSelected(object sender, NavBarMenuTappedMessage args)
+     {
+       // Close the menu upon selection
+       IsPageMenuShowing = !IsPageMenuShowing;
+     }
 
-      protected override void AfterContentSet(RelativeLayout layout)
-      {
-         // No need to add it twice
-         if (_canvas == null || _canvas.Children.Contains(PageMenuView))
-         {
-            return;
-         }
-
-         PageMenuView.Opacity = 0;
-
-         var targetRect = CreateOfflineRectangle();
-
-         layout.CreateRelativeOverlay(_canvas);
-
-         // A slight cheat; using protected property
-         _canvas.Children.Add(PageMenuView, targetRect);
-      }
-
-      protected override void OnDisappearing()
-      {
-         base.OnDisappearing();
-
-         FormsMessengerUtils.Unsubscribe<NavBarMenuTappedMessage>(this);
-
-         RemoveMenuFromLayout();
-      }
-
-      #endregion Protected Methods
-
-      #region Private Methods
-
-      private Rectangle CreateOfflineRectangle()
-      {
-         return new Rectangle(OrientationService.ScreenWidth, 0, 0, PageMenu.MenuHeight);
-      }
-
-      /// <summary>
-      ///    Animates the panel in our out depending on the state
-      /// </summary>
-      private async Task AnimatePageMenu()
-      {
-         if (IsPageMenuShowing)
-         {
-            // Slide the menu up from the bottom
-            var rect =
-               new Rectangle
-               (
-                  Width - MainMenu.MENU_GROSS_WIDTH,
-                  0,
-                  MainMenu.MENU_GROSS_WIDTH,
-                  PageMenu.MenuHeight
-               );
-
-            await Task.WhenAll(PageMenuView.LayoutTo(rect, MENU_ANIMATE_MILLISECONDS, Easing.CubicIn),
-               PageMenuView.FadeTo(1.0, MENU_FADE_MILLISECONDS)).WithoutChangingContext();
-         }
-         else
-         {
-            // Retract the menu
-            var rect = CreateOfflineRectangle();
-
-            await Task.WhenAll(PageMenuView.LayoutTo(rect, MENU_ANIMATE_MILLISECONDS, Easing.CubicOut),
-               PageMenuView.FadeTo(0.0, MENU_FADE_MILLISECONDS)).WithoutChangingContext();
-         }
-      }
-
-      private void OnMainMenuItemSelected(object sender, NavBarMenuTappedMessage args)
-      {
-         // Close the menu upon selection
-         IsPageMenuShowing = !IsPageMenuShowing;
-      }
-
-      #endregion Private Methods
+     #endregion Private Methods
    }
 }

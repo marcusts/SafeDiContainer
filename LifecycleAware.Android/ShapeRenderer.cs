@@ -1,21 +1,19 @@
-#region License
-
 // MIT License
-// 
-// Copyright (c) 2018 
+//
+// Copyright (c) 2018
 // Marcus Technical Services, Inc.
 // http://www.marcusts.com
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,36 +22,32 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#endregion
-
 #define ADD_SHADOW
 
-#region Imports
-
-using LifecycleAware.Droid;
+using LifecycleAware.Android;
 using SharedForms.Views.Controls;
 using Xamarin.Forms;
-
-#endregion
+using Context = Android.Content.Context;
 
 [assembly: ExportRenderer(typeof(ShapeView), typeof(ShapeRenderer))]
 
-namespace LifecycleAware.Droid
+namespace LifecycleAware.Android
 {
-   #region Imports
-
    using System.ComponentModel;
-   using Android.Content;
    using SharedForms.Views.Controls;
    using Xamarin.Forms.Platform.Android;
 
-   #endregion
-
-   public class ShapeRenderer : ViewRenderer<ShapeView, LifecycleAware.Droid.Shape>
+   public class ShapeRenderer : ViewRenderer<ShapeView, LifecycleAware.Android.Shape>
    {
+      #region Public Constructors
+
       public ShapeRenderer(Context context) : base(context)
       {
       }
+
+      #endregion Public Constructors
+
+      #region Protected Methods
 
       protected override void OnElementChanged(ElementChangedEventArgs<ShapeView> e)
       {
@@ -64,7 +58,7 @@ namespace LifecycleAware.Droid
             return;
          }
 
-         var shape = new LifecycleAware.Droid.Shape(Resources.DisplayMetrics.Density, Context, Element);
+         var shape = new LifecycleAware.Android.Shape(Resources.DisplayMetrics.Density, Context, Element);
          SetNativeControl(shape);
       }
 
@@ -92,5 +86,7 @@ namespace LifecycleAware.Droid
                break;
          }
       }
+
+      #endregion Protected Methods
    }
 }

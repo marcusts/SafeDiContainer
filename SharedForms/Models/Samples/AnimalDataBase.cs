@@ -31,53 +31,53 @@ namespace SharedForms.Models.Samples
 
    public abstract class AnimalDataBase : IAnimalDataBase
    {
-      #region Protected Properties
+     #region Protected Properties
 
-      protected abstract string AnimalPrefix { get; }
+     protected abstract string AnimalPrefix { get; }
 
-      #endregion Protected Properties
+     #endregion Protected Properties
 
-      #region Public Methods
+     #region Public Methods
 
-      public string GetAnimalImageSource(IMakeBigDecisions bigDecider)
-      {
-         return bigDecider != null && bigDecider.IAmBig ? BigImageSource : SmallImageSource;
-      }
+     public string GetAnimalImageSource(IMakeBigDecisions bigDecider)
+     {
+       return bigDecider != null && bigDecider.IAmBig ? BigImageSource : SmallImageSource;
+     }
 
-      #endregion Public Methods
+     #endregion Public Methods
 
-      #region Private Methods
+     #region Private Methods
 
-      private static string MakeImageSourceString(string prefix, bool iAmBig)
-      {
-         // HACK suffix - jpg --
-         return prefix + "_" + (iAmBig ? "big" : "small") + ".jpg";
-      }
+     private static string MakeImageSourceString(string prefix, bool iAmBig)
+     {
+       // HACK suffix - jpg --
+       return prefix + "_" + (iAmBig ? "big" : "small") + ".jpg";
+     }
 
-      #endregion Private Methods
+     #endregion Private Methods
 
-      #region Public Properties
+     #region Public Properties
 
-      public string BigImageSource => MakeImageSourceString(AnimalPrefix, true);
-      public string SmallImageSource => MakeImageSourceString(AnimalPrefix, false);
+     public string BigImageSource => MakeImageSourceString(AnimalPrefix, true);
+     public string SmallImageSource => MakeImageSourceString(AnimalPrefix, false);
 
-      #endregion Public Properties
+     #endregion Public Properties
    }
 
    public interface IAnimalDataBase
    {
-      #region Public Methods
+     #region Public Methods
 
-      string GetAnimalImageSource(IMakeBigDecisions bigDecider);
+     string GetAnimalImageSource(IMakeBigDecisions bigDecider);
 
-      #endregion Public Methods
+     #endregion Public Methods
 
-      #region Public Properties
+     #region Public Properties
 
-      string BigImageSource { get; }
+     string BigImageSource { get; }
 
-      string SmallImageSource { get; }
+     string SmallImageSource { get; }
 
-      #endregion Public Properties
+     #endregion Public Properties
    }
 }

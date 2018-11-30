@@ -31,27 +31,27 @@ namespace SharedForms.Common.Generators
 
    public class MenuNavigationState : IMenuNavigationState
    {
-      #region Public Constructors
+     #region Public Constructors
 
-      public MenuNavigationState(int menuOrder, string menuTitle, string viewTitle, string appState)
-      {
-         MenuOrder = menuOrder;
-         MenuTitle = menuTitle;
-         ViewTitle = viewTitle;
-         AppState = appState;
-      }
+     public MenuNavigationState(int menuOrder, string menuTitle, string viewTitle, string appState)
+     {
+       MenuOrder = menuOrder;
+       MenuTitle = menuTitle;
+       ViewTitle = viewTitle;
+       AppState = appState;
+     }
 
-      #endregion Public Constructors
+     #endregion Public Constructors
 
-      #region Public Properties
+     #region Public Properties
 
-      public string AppState { get; }
-      public int MenuOrder { get; }
+     public string AppState { get; }
+     public int MenuOrder { get; }
 
-      public string MenuTitle { get; }
+     public string MenuTitle { get; }
 
-      public string ViewTitle { get; }
+     public string ViewTitle { get; }
 
-      #endregion Public Properties
+     #endregion Public Properties
    }
 }

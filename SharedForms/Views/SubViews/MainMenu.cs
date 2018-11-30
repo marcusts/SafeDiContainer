@@ -34,143 +34,143 @@ namespace SharedForms.Views.SubViews
 
    public class MainMenu : ContentView, IMainMenu
    {
-      #region Public Variables
+     #region Public Variables
 
-      public static readonly double MENU_OUTSIDE_SINGLE_MARGIN = 15.0;
+     public static readonly double MENU_OUTSIDE_SINGLE_MARGIN = 15.0;
 
-      public static readonly double MENU_INSIDE_SINGLE_MARGIN = MENU_OUTSIDE_SINGLE_MARGIN / 2;
+     public static readonly double MENU_INSIDE_SINGLE_MARGIN = MENU_OUTSIDE_SINGLE_MARGIN / 2;
 
-      public static readonly Thickness MENU_OUTSIDE_MARGIN = new Thickness(MENU_OUTSIDE_SINGLE_MARGIN);
+     public static readonly Thickness MENU_OUTSIDE_MARGIN = new Thickness(MENU_OUTSIDE_SINGLE_MARGIN);
 
-      public static readonly double MENU_ITEM_WIDTH = 120.0;
+     public static readonly double MENU_ITEM_WIDTH = 120.0;
 
-      public static readonly double MENU_GROSS_WIDTH = MENU_ITEM_WIDTH + 2 * MENU_OUTSIDE_SINGLE_MARGIN;
+     public static readonly double MENU_GROSS_WIDTH = MENU_ITEM_WIDTH + 2 * MENU_OUTSIDE_SINGLE_MARGIN;
 
-      #endregion Public Variables
+     #endregion Public Variables
 
-      #region Public Constructors
+     #region Public Constructors
 
-      public MainMenu(IStateMachineBase stateMachine)
-      {
-         _stateMachine = stateMachine;
+     public MainMenu(IStateMachineBase stateMachine)
+     {
+       _stateMachine = stateMachine;
 
-         // Not really used
-         BindingContext = this;
+       // Not really used
+       BindingContext = this;
 
-         VerticalOptions = LayoutOptions.StartAndExpand;
-         HorizontalOptions = LayoutOptions.CenterAndExpand;
+       VerticalOptions = LayoutOptions.StartAndExpand;
+       HorizontalOptions = LayoutOptions.CenterAndExpand;
 
-         BackgroundColor = ColorUtils.HEADER_AND_TOOLBAR_COLOR;
-         Opacity = MAIN_MENU_OPACITY;
+       BackgroundColor = ColorUtils.HEADER_AND_TOOLBAR_COLOR;
+       Opacity = MAIN_MENU_OPACITY;
 
-         InputTransparent = ALLOW_EVENT_TUNNELING;
+       InputTransparent = ALLOW_EVENT_TUNNELING;
 
-         LoadMenuFromStateMachine();
-      }
+       LoadMenuFromStateMachine();
+     }
 
-      #endregion Public Constructors
+     #endregion Public Constructors
 
-      #region Private Variables
+     #region Private Variables
 
-      private const bool ALLOW_EVENT_TUNNELING = false;
+     private const bool ALLOW_EVENT_TUNNELING = false;
 
-      private static readonly double MAIN_MENU_OPACITY = 0.95;
+     private static readonly double MAIN_MENU_OPACITY = 0.95;
 
-      private static readonly double MENU_ITEM_HEIGHT = 40.0;
+     private static readonly double MENU_ITEM_HEIGHT = 40.0;
 
-      private readonly IStateMachineBase _stateMachine;
+     private readonly IStateMachineBase _stateMachine;
 
-      private bool _isMenuLoaded;
+     private bool _isMenuLoaded;
 
-      #endregion Private Variables
+     #endregion Private Variables
 
-      #region Public Properties
+     #region Public Properties
 
-      public bool IsMenuLoaded
-      {
-         get => _isMenuLoaded;
-         private set
+     public bool IsMenuLoaded
+     {
+       get => _isMenuLoaded;
+       private set
+       {
+         _isMenuLoaded = value;
+
+         FormsMessengerUtils.Send(new MenuLoadedMessage());
+       }
+     }
+
+     public double MenuHeight { get; private set; }
+
+     #endregion Public Properties
+
+     #region Private Methods
+
+     private Button CreateMenuItemButton(IMenuNavigationState menuData)
+     {
+       var retButton =
+         new Button
          {
-            _isMenuLoaded = value;
-
-            FormsMessengerUtils.Send(new MenuLoadedMessage());
-         }
-      }
-
-      public double MenuHeight { get; private set; }
-
-      #endregion Public Properties
-
-      #region Private Methods
-
-      private Button CreateMenuItemButton(IMenuNavigationState menuData)
-      {
-         var retButton =
-            new Button
-            {
-               Text = menuData.MenuTitle,
-               WidthRequest = MENU_ITEM_WIDTH,
-               HeightRequest = MENU_ITEM_HEIGHT,
-               HorizontalOptions = LayoutOptions.Center,
-               VerticalOptions = LayoutOptions.Center,
-               InputTransparent = ALLOW_EVENT_TUNNELING
-            };
-
-         retButton.Clicked += (s, e) =>
-         {
-            // Ask to close the menu as if the user tapped the hamburger icon.
-            FormsMessengerUtils.Send(new NavBarMenuTappedMessage());
-
-            _stateMachine.GoToAppState(menuData.AppState, false);
+            Text = menuData.MenuTitle,
+            WidthRequest = MENU_ITEM_WIDTH,
+            HeightRequest = MENU_ITEM_HEIGHT,
+            HorizontalOptions = LayoutOptions.Center,
+            VerticalOptions = LayoutOptions.Center,
+            InputTransparent = ALLOW_EVENT_TUNNELING
          };
 
-         return retButton;
-      }
+       retButton.Clicked += (s, e) =>
+       {
+         // Ask to close the menu as if the user tapped the hamburger icon.
+         FormsMessengerUtils.Send(new NavBarMenuTappedMessage());
 
-      private void LoadMenuFromStateMachine()
-      {
-         // A grid to handle the entire menu
-         var menuStack = FormsUtils.GetExpandingStackLayout();
-         menuStack.VerticalOptions = LayoutOptions.StartAndExpand;
-         menuStack.HorizontalOptions = LayoutOptions.CenterAndExpand;
-         menuStack.Margin = MENU_OUTSIDE_MARGIN;
-         menuStack.Spacing = MENU_INSIDE_SINGLE_MARGIN;
-         menuStack.InputTransparent = ALLOW_EVENT_TUNNELING;
+         _stateMachine.GoToAppState(menuData.AppState, false);
+       };
 
-         var singleMenuItemHeight = MENU_ITEM_HEIGHT + MENU_INSIDE_SINGLE_MARGIN;
+       return retButton;
+     }
 
-         // Allow for the top and bottom margins, etc.
-         MenuHeight = 2 * MENU_OUTSIDE_SINGLE_MARGIN;
+     private void LoadMenuFromStateMachine()
+     {
+       // A grid to handle the entire menu
+       var menuStack = FormsUtils.GetExpandingStackLayout();
+       menuStack.VerticalOptions = LayoutOptions.StartAndExpand;
+       menuStack.HorizontalOptions = LayoutOptions.CenterAndExpand;
+       menuStack.Margin = MENU_OUTSIDE_MARGIN;
+       menuStack.Spacing = MENU_INSIDE_SINGLE_MARGIN;
+       menuStack.InputTransparent = ALLOW_EVENT_TUNNELING;
 
-         foreach (var menuData in _stateMachine.MenuItems)
-         {
-            menuStack.Children.Add(CreateMenuItemButton(menuData));
-            MenuHeight += singleMenuItemHeight;
-         }
+       var singleMenuItemHeight = MENU_ITEM_HEIGHT + MENU_INSIDE_SINGLE_MARGIN;
 
-         HeightRequest = MenuHeight;
-         WidthRequest = MENU_GROSS_WIDTH;
+       // Allow for the top and bottom margins, etc.
+       MenuHeight = 2 * MENU_OUTSIDE_SINGLE_MARGIN;
 
-         var scroller = FormsUtils.GetExpandingScrollView();
-         scroller.InputTransparent = ALLOW_EVENT_TUNNELING;
-         scroller.Content = menuStack;
+       foreach (var menuData in _stateMachine.MenuItems)
+       {
+         menuStack.Children.Add(CreateMenuItemButton(menuData));
+         MenuHeight += singleMenuItemHeight;
+       }
 
-         Content = scroller;
+       HeightRequest = MenuHeight;
+       WidthRequest = MENU_GROSS_WIDTH;
 
-         IsMenuLoaded = true;
-      }
+       var scroller = FormsUtils.GetExpandingScrollView();
+       scroller.InputTransparent = ALLOW_EVENT_TUNNELING;
+       scroller.Content = menuStack;
 
-      #endregion Private Methods
+       Content = scroller;
+
+       IsMenuLoaded = true;
+     }
+
+     #endregion Private Methods
    }
 
    public interface IMainMenu
    {
-      #region Public Properties
+     #region Public Properties
 
-      bool IsMenuLoaded { get; }
+     bool IsMenuLoaded { get; }
 
-      double MenuHeight { get; }
+     double MenuHeight { get; }
 
-      #endregion Public Properties
+     #endregion Public Properties
    }
 }

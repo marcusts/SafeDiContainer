@@ -34,12 +34,12 @@ namespace SharedForms.Common.Utils
 
    public enum PageLifecycleEvents
    {
-      BeforeConstructing,
-      AfterConstructing,
-      BeforeAppearing,
-      AfterAppearing,
-      BeforeDisappearing,
-      AfterDisappearing
+     BeforeConstructing,
+     AfterConstructing,
+     BeforeAppearing,
+     AfterAppearing,
+     BeforeDisappearing,
+     AfterDisappearing
    }
 
    /// <summary>
@@ -47,63 +47,63 @@ namespace SharedForms.Common.Utils
    /// </summary>
    public static class FormsMessengerUtils
    {
-      #region Public Methods
+     #region Public Methods
 
-      public static void Send<TMessage>(TMessage message, object sender = null) where TMessage : IMessage
-      {
-         if (sender == null)
-         {
-            sender = new object();
-         }
+     public static void Send<TMessage>(TMessage message, object sender = null) where TMessage : IMessage
+     {
+       if (sender == null)
+       {
+         sender = new object();
+       }
 
-         MessagingCenter.Send(sender, typeof(TMessage).FullName, message);
-      }
+       MessagingCenter.Send(sender, typeof(TMessage).FullName, message);
+     }
 
-      public static void Subscribe<TMessage>(object subscriber, Action<object, TMessage> callback)
-         where TMessage : IMessage
-      {
-         MessagingCenter.Subscribe(subscriber, typeof(TMessage).FullName, callback);
-      }
+     public static void Subscribe<TMessage>(object subscriber, Action<object, TMessage> callback)
+       where TMessage : IMessage
+     {
+       MessagingCenter.Subscribe(subscriber, typeof(TMessage).FullName, callback);
+     }
 
-      public static void Unsubscribe<TMessage>(object subscriber) where TMessage : IMessage
-      {
-         MessagingCenter.Unsubscribe<object, TMessage>(subscriber, typeof(TMessage).FullName);
-      }
+     public static void Unsubscribe<TMessage>(object subscriber) where TMessage : IMessage
+     {
+       MessagingCenter.Unsubscribe<object, TMessage>(subscriber, typeof(TMessage).FullName);
+     }
 
-      #endregion Public Methods
+     #endregion Public Methods
    }
 
    public class AppStateChangedMessage : GenericMessageWithPayload<AppStateChangeMessageArgs>
    {
-      #region Public Constructors
+     #region Public Constructors
 
-      public AppStateChangedMessage(string oldAppState, bool preventNavStackPush)
-      {
-         Payload = new AppStateChangeMessageArgs(oldAppState, preventNavStackPush);
-      }
+     public AppStateChangedMessage(string oldAppState, bool preventNavStackPush)
+     {
+       Payload = new AppStateChangeMessageArgs(oldAppState, preventNavStackPush);
+     }
 
-      #endregion Public Constructors
+     #endregion Public Constructors
    }
 
    public class AppStateChangeMessageArgs
    {
-      #region Public Constructors
+     #region Public Constructors
 
-      public AppStateChangeMessageArgs(string oldAppState, bool preventNavStackPush)
-      {
-         OldAppState = oldAppState;
-         PreventNavStackPush = preventNavStackPush;
-      }
+     public AppStateChangeMessageArgs(string oldAppState, bool preventNavStackPush)
+     {
+       OldAppState = oldAppState;
+       PreventNavStackPush = preventNavStackPush;
+     }
 
-      #endregion Public Constructors
+     #endregion Public Constructors
 
-      #region Public Properties
+     #region Public Properties
 
-      public string OldAppState { get; set; }
+     public string OldAppState { get; set; }
 
-      public bool PreventNavStackPush { get; set; }
+     public bool PreventNavStackPush { get; set; }
 
-      #endregion Public Properties
+     #endregion Public Properties
    }
 
    /// <summary>
@@ -111,14 +111,14 @@ namespace SharedForms.Common.Utils
    /// </summary>
    public class BroadcastDeviceSizeChangedMessage : GenericMessageWithPayload<DeviceSizeChangeMessageArgs>
    {
-      #region Public Constructors
+     #region Public Constructors
 
-      public BroadcastDeviceSizeChangedMessage(float width, float height)
-      {
-         Payload = new DeviceSizeChangeMessageArgs(width, height);
-      }
+     public BroadcastDeviceSizeChangedMessage(float width, float height)
+     {
+       Payload = new DeviceSizeChangeMessageArgs(width, height);
+     }
 
-      #endregion Public Constructors
+     #endregion Public Constructors
    }
 
    /// <summary>
@@ -127,14 +127,14 @@ namespace SharedForms.Common.Utils
    /// </summary>
    public class LocalDeviceSizeChangedMessage : GenericMessageWithPayload<DeviceSizeChangeMessageArgs>
    {
-      #region Public Constructors
+     #region Public Constructors
 
-      public LocalDeviceSizeChangedMessage(float width, float height)
-      {
-         Payload = new DeviceSizeChangeMessageArgs(width, height);
-      }
+     public LocalDeviceSizeChangedMessage(float width, float height)
+     {
+       Payload = new DeviceSizeChangeMessageArgs(width, height);
+     }
 
-      #endregion Public Constructors
+     #endregion Public Constructors
    }
 
    /// <summary>
@@ -142,49 +142,49 @@ namespace SharedForms.Common.Utils
    /// </summary>
    public class DeviceSizeChangeMessageArgs : IDeviceSizeChangeMessageArgs
    {
-      #region Public Constructors
+     #region Public Constructors
 
-      public DeviceSizeChangeMessageArgs(float width, float height)
-      {
-         ScreenWidth = width;
-         ScreenHeight = height;
-      }
+     public DeviceSizeChangeMessageArgs(float width, float height)
+     {
+       ScreenWidth = width;
+       ScreenHeight = height;
+     }
 
-      #endregion Public Constructors
+     #endregion Public Constructors
 
-      #region Public Properties
+     #region Public Properties
 
-      public float ScreenHeight { get; set; }
-      public float ScreenWidth { get; set; }
+     public float ScreenHeight { get; set; }
+     public float ScreenWidth { get; set; }
 
-      #endregion Public Properties
+     #endregion Public Properties
    }
 
    public abstract class GenericMessageWithPayload<T> : IMessage
    {
-      #region Public Properties
+     #region Public Properties
 
-      public T Payload { get; set; }
+     public T Payload { get; set; }
 
-      #endregion Public Properties
+     #endregion Public Properties
    }
 
    public class MainPageBindingContextChangeRequestMessage : GenericMessageWithPayload<IViewModelBase>
    {
-      #region Public Properties
+     #region Public Properties
 
-      public bool PreventNavStackPush { get; set; }
+     public bool PreventNavStackPush { get; set; }
 
-      #endregion Public Properties
+     #endregion Public Properties
    }
 
    public class MainPageChangeRequestMessage : GenericMessageWithPayload<Page>
    {
-      #region Public Properties
+     #region Public Properties
 
-      public bool PreventNavStackPush { get; set; }
+     public bool PreventNavStackPush { get; set; }
 
-      #endregion Public Properties
+     #endregion Public Properties
    }
 
    public class MenuLoadedMessage : NoPayloadMessage
@@ -205,44 +205,44 @@ namespace SharedForms.Common.Utils
 
    public class PageLifecycleMessage : GenericMessageWithPayload<IPageLifecycleMessageArgs>
    {
-      #region Public Constructors
+     #region Public Constructors
 
-      public PageLifecycleMessage(IProvidePageEvents sendingPage, PageLifecycleEvents pageEvent)
-      {
-         Payload = new PageLifecycleMessageArgs(sendingPage, pageEvent);
-      }
+     public PageLifecycleMessage(IProvidePageEvents sendingPage, PageLifecycleEvents pageEvent)
+     {
+       Payload = new PageLifecycleMessageArgs(sendingPage, pageEvent);
+     }
 
-      #endregion Public Constructors
+     #endregion Public Constructors
    }
 
    public class PageLifecycleMessageArgs : IPageLifecycleMessageArgs
    {
-      #region Public Constructors
+     #region Public Constructors
 
-      public PageLifecycleMessageArgs(IProvidePageEvents sendingPage, PageLifecycleEvents pageEvent)
-      {
-         SendingPage = sendingPage;
-         PageEvent = pageEvent;
-      }
+     public PageLifecycleMessageArgs(IProvidePageEvents sendingPage, PageLifecycleEvents pageEvent)
+     {
+       SendingPage = sendingPage;
+       PageEvent = pageEvent;
+     }
 
-      #endregion Public Constructors
+     #endregion Public Constructors
 
-      #region Public Properties
+     #region Public Properties
 
-      public PageLifecycleEvents PageEvent { get; set; }
-      public IProvidePageEvents SendingPage { get; set; }
+     public PageLifecycleEvents PageEvent { get; set; }
+     public IProvidePageEvents SendingPage { get; set; }
 
-      #endregion Public Properties
+     #endregion Public Properties
    }
 
    public interface IDeviceSizeChangeMessageArgs
    {
-      #region Public Properties
+     #region Public Properties
 
-      float ScreenHeight { get; set; }
-      float ScreenWidth { get; set; }
+     float ScreenHeight { get; set; }
+     float ScreenWidth { get; set; }
 
-      #endregion Public Properties
+     #endregion Public Properties
    }
 
    public interface IMessage
@@ -251,11 +251,11 @@ namespace SharedForms.Common.Utils
 
    public interface IPageLifecycleMessageArgs
    {
-      #region Public Properties
+     #region Public Properties
 
-      PageLifecycleEvents PageEvent { get; set; }
-      IProvidePageEvents SendingPage { get; set; }
+     PageLifecycleEvents PageEvent { get; set; }
+     IProvidePageEvents SendingPage { get; set; }
 
-      #endregion Public Properties
+     #endregion Public Properties
    }
 }

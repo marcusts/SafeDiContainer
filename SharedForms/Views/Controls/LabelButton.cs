@@ -39,140 +39,140 @@ namespace SharedForms.Views.Controls
 
    public class LabelButton : GenericViewButtonBase<Label>, ILabelButton
    {
-      private Style _deselectedLabelButtonStyle;
-      private Style _disabledLabelButtonStyle;
-      private Style _selectedLabelButtonStyle;
+     private Style _deselectedLabelButtonStyle;
+     private Style _disabledLabelButtonStyle;
+     private Style _selectedLabelButtonStyle;
 
-      public LabelButton
-      (
-         Label label
-      )
-      {
-          if (label == null)
-          {
-             label = new Label();
-          }
+     public LabelButton
+     (
+       Label label
+     )
+     {
+        if (label == null)
+        {
+          label = new Label();
+        }
 
-         label.InputTransparent = true;
+       label.InputTransparent = true;
 
-         InternalView = label;
+       InternalView = label;
 
-         // The label always has a transparent background
-         BackgroundColor = Color.Transparent;
+       // The label always has a transparent background
+       BackgroundColor = Color.Transparent;
 
-         // Applies to the base control only
-         InputTransparent = false;
+       // Applies to the base control only
+       InputTransparent = false;
 
-         // Force-refresh the label styles; this will configure the label properly
+       // Force-refresh the label styles; this will configure the label properly
+       SetStyle();
+     }
+
+     public LabelButton()
+     : this(null)
+     {
+     }
+
+     public Style SelectedLabelStyle
+     {
+       get => _selectedLabelButtonStyle;
+       set
+       {
+         _selectedLabelButtonStyle = value;
          SetStyle();
-      }
+       }
+     }
 
-      public LabelButton()
-      : this(null)
-      {
-      }
+     public Style DeselectedLabelStyle
+     {
+       get => _deselectedLabelButtonStyle;
+       set
+       {
+         _deselectedLabelButtonStyle = value;
+         SetStyle();
+       }
+     }
 
-      public Style SelectedLabelStyle
-      {
-         get => _selectedLabelButtonStyle;
-         set
-         {
-            _selectedLabelButtonStyle = value;
-            SetStyle();
-         }
-      }
+     public Style DisabledLabelStyle
+     {
+       get => _disabledLabelButtonStyle;
+       set
+       {
+         _disabledLabelButtonStyle = value;
+         SetStyle();
+       }
+     }
 
-      public Style DeselectedLabelStyle
-      {
-         get => _deselectedLabelButtonStyle;
-         set
-         {
-            _deselectedLabelButtonStyle = value;
-            SetStyle();
-         }
-      }
+     protected override void SetStyle()
+     {
+       base.SetStyle();
 
-      public Style DisabledLabelStyle
-      {
-         get => _disabledLabelButtonStyle;
-         set
-         {
-            _disabledLabelButtonStyle = value;
-            SetStyle();
-         }
-      }
+       if (InternalView == null)
+       {
+         return;
+       }
 
-      protected override void SetStyle()
-      {
-         base.SetStyle();
+       Style newStyle = null;
 
-         if (InternalView == null)
-         {
-            return;
-         }
+       // Set the style based on being enabled/disabled
+       if (ButtonState == ButtonStates.Disabled)
+       {
+         newStyle = DisabledLabelStyle ?? DeselectedLabelStyle;
+       }
+       else if (ButtonState == ButtonStates.Selected)
+       {
+         newStyle = SelectedLabelStyle ?? DeselectedLabelStyle;
+       }
+       else
+       {
+         newStyle = DeselectedLabelStyle;
+       }
 
-         Style newStyle = null;
-
-         // Set the style based on being enabled/disabled
-         if (ButtonState == ButtonStates.Disabled)
-         {
-            newStyle = DisabledLabelStyle ?? DeselectedLabelStyle;
-         }
-         else if (ButtonState == ButtonStates.Selected)
-         {
-            newStyle = SelectedLabelStyle ?? DeselectedLabelStyle;
-         }
-         else
-         {
-            newStyle = DeselectedLabelStyle;
-         }
-
-         // Can't call Equal comparisons on list-style records
-         //if (newStyle != null && (InternalView.Style == null || InternalView.Style.IsNotAnEqualObjectTo(newStyle)))
-         //{
+       // Can't call Equal comparisons on list-style records
+       //if (newStyle != null && (InternalView.Style == null || InternalView.Style.IsNotAnEqualObjectTo(newStyle)))
+       //{
 #if MERGE_STYLES
-         InternalView.Style = InternalView.Style.MergeStyle<LabelButton>(newStyle);
+       InternalView.Style = InternalView.Style.MergeStyle<LabelButton>(newStyle);
 #else
-         InternalView.Style = newStyle;
+       InternalView.Style = newStyle;
 #endif
 
-         // This library is not working well with styles, so forcing all settings manually
-         InternalView.ForceStyle(newStyle);
-         //}
-      }
+       // This library is not working well with styles, so forcing all settings manually
+       InternalView.ForceStyle(newStyle);
+       //}
+     }
 
-      public static Style CreateLabelStyle
-      (
-         Color textColor,
-         double fontSize,
-         FontAttributes fontAttributes = FontAttributes.None
-      )
-      {
-         return new Style(typeof(Label))
+     public static Style CreateLabelStyle
+     (
+       Color textColor,
+       double fontSize,
+       FontAttributes fontAttributes = FontAttributes.None
+     )
+     {
+       return new Style(typeof(Label))
+       {
+         Setters =
          {
-            Setters =
-            {
-               // The text color is now the background color -- should be white
-               new Setter { Property = Label.TextColorProperty, Value = textColor },
+            // The text color is now the background color -- should be white
+            new Setter { Property = Label.TextColorProperty, Value = textColor },
 
-               // The label is always transparent
-               new Setter { Property = BackgroundColorProperty, Value = Color.Transparent },
+            // The label is always transparent
+            new Setter { Property = BackgroundColorProperty, Value = Color.Transparent },
 
-               new Setter { Property = Label.FontAttributesProperty, Value = fontAttributes },
-               new Setter { Property = Label.FontSizeProperty, Value = fontSize }
-            }
-         };
-      }
+            new Setter { Property = Label.FontAttributesProperty, Value = fontAttributes },
+            new Setter { Property = Label.FontSizeProperty, Value = fontSize }
+         }
+       };
+     }
 
-      public static BindableProperty CreateLabelButtonBindableProperty<PropertyTypeT>
-      (
-         string localPropName,
-         PropertyTypeT defaultVal = default(PropertyTypeT),
-         BindingMode bindingMode = BindingMode.OneWay,
-         Action<LabelButton, PropertyTypeT, PropertyTypeT> callbackAction = null
-      )
-      {
-         return BindableUtils.CreateBindableProperty(localPropName, defaultVal, bindingMode, callbackAction);
-      }
+     public static BindableProperty CreateLabelButtonBindableProperty<PropertyTypeT>
+     (
+       string localPropName,
+       PropertyTypeT defaultVal = default(PropertyTypeT),
+       BindingMode bindingMode = BindingMode.OneWay,
+       Action<LabelButton, PropertyTypeT, PropertyTypeT> callbackAction = null
+     )
+     {
+       return BindableUtils.CreateBindableProperty(localPropName, defaultVal, bindingMode, callbackAction);
+     }
    }
 }

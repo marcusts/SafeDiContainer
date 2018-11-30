@@ -11,16 +11,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Acr.UserDialogs" Version="7.0.1" />
-    <PackageReference Include="Autofac" Version="4.8.0" />
-    <PackageReference Include="Fody" Version="3.0.3" />
-    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="2.0.4" />
-    <PackageReference Include="PropertyChanged.Fody" Version="2.5.4" />
-    <PackageReference Include="Xamarin.Forms" Version="2.5.1.444934" />
-    <PackageReference Include="Xamarin.Forms.Plugin.CustomToggleButton" Version="1.0.1" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\SharedUtils\SharedUtils.csproj" />
   </ItemGroup>
 

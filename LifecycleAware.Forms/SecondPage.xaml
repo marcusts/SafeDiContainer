@@ -1,17 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="LifecycleAware.Forms.SecondPage">
+          xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+          x:Class="LifecycleAware.Forms.SecondPage">
 
    <StackLayout
-      VerticalOptions="Center"
-      HorizontalOptions="Center"
-      Spacing="15"
-   >
-      <Label Text="SECOND PAGE" VerticalOptions="Center" HorizontalOptions="Center" FontSize="Large"/>
-      <Label Text="{Binding Message}" VerticalOptions="Center" HorizontalOptions="Center" FontSize="Medium"/>
-      <Label Text="Remaining Time" VerticalOptions="Center" HorizontalOptions="Center" FontSize="Small"/>
-      <Label Text="{Binding TimeRemaining, StringFormat='{}{0:mm\\:ss}'}" VerticalOptions="Center" HorizontalOptions="Center" FontSize="Medium" FontAttributes="Bold"/>
+     VerticalOptions="Center"
+     HorizontalOptions="Center"
+     Spacing="15">
+     <Label Text="SECOND PAGE" VerticalOptions="Center" HorizontalOptions="Center" FontSize="Large" />
+     <Label Text="{Binding Message}" VerticalOptions="Center" HorizontalOptions="Center" FontSize="Medium" />
+     <Label Text="Remaining Time" VerticalOptions="Center" HorizontalOptions="Center" FontSize="Small" />
+     <Label Text="{Binding TimeRemaining, StringFormat='{}{0:mm\\:ss}'}" VerticalOptions="Center" HorizontalOptions="Center" FontSize="Medium" FontAttributes="Bold" />
    </StackLayout>
-
 </ContentPage>

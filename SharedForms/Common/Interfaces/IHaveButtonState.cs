@@ -32,28 +32,28 @@ namespace SharedForms.Common.Interfaces
 
    public enum ButtonStates
    {
-      // Important to have this first
-      Deselected,
+     // Important to have this first
+     Deselected,
 
-      Selected,
-      Disabled
+     Selected,
+     Disabled
    }
 
    public interface IHaveButtonState
    {
-      #region Public Events
+     #region Public Events
 
-      event EventHandler<ButtonStates> ButtonStateChanged;
+     event EventHandler<ButtonStates> ButtonStateChanged;
 
-      event EventUtils.NoParamsDelegate ViewButtonPressed;
+     event EventUtils.NoParamsDelegate ViewButtonPressed;
 
-      #endregion Public Events
+     #endregion Public Events
 
-      #region Public Properties
+     #region Public Properties
 
-      ButtonStates ButtonState { get; set; }
-      int SelectionGroup { get; set; }
+     ButtonStates ButtonState { get; set; }
+     int SelectionGroup { get; set; }
 
-      #endregion Public Properties
+     #endregion Public Properties
    }
 }

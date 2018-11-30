@@ -32,60 +32,60 @@ namespace SharedForms.Common.Utils
 
    public static class ViewUtils
    {
-      #region Private Variables
+     #region Private Variables
 
-      private const double NORMAL_BUTTON_FONT_SIZE = 20;
+     private const double NORMAL_BUTTON_FONT_SIZE = 20;
 
-      private const double SELECTED_BUTTON_FONT_SIZE = NORMAL_BUTTON_FONT_SIZE * 1.1;
+     private const double SELECTED_BUTTON_FONT_SIZE = NORMAL_BUTTON_FONT_SIZE * 1.1;
 
-      // Xamarin bug -- calculation is pristine, but the pages do not align properly on-screen
-      private const double SLOP = 6;
+     // Xamarin bug -- calculation is pristine, but the pages do not align properly on-screen
+     private const double SLOP = 6;
 
-      private static readonly double SELECTED_IMAGE_BUTTON_BORDER_WIDTH = 2;
+     private static readonly double SELECTED_IMAGE_BUTTON_BORDER_WIDTH = 2;
 
-      #endregion Private Variables
+     #endregion Private Variables
 
-      #region Public Methods
+     #region Public Methods
 
-      public static void ClearCompletely(this Grid grid)
-      {
-         grid.Children.Clear();
-         grid.ColumnDefinitions.Clear();
-         grid.RowDefinitions.Clear();
-      }
+     public static void ClearCompletely(this Grid grid)
+     {
+       grid.Children.Clear();
+       grid.ColumnDefinitions.Clear();
+       grid.RowDefinitions.Clear();
+     }
 
-      public static double GetAdjustedScreenWidth(int viewIdx, double currentWidth)
-      {
-         var properX = -(viewIdx * currentWidth);
-         var sloppyX = properX - viewIdx * SLOP;
+     public static double GetAdjustedScreenWidth(int viewIdx, double currentWidth)
+     {
+       var properX = -(viewIdx * currentWidth);
+       var sloppyX = properX - viewIdx * SLOP;
 
-         return sloppyX;
-      }
+       return sloppyX;
+     }
 
-      public static void SetBorderSelectionStyles(this ImageButton retButton)
-      {
-         // No disabled image treatment as of yet
+     public static void SetBorderSelectionStyles(this ImageButton retButton)
+     {
+       // No disabled image treatment as of yet
 
-         retButton.DeselectedButtonStyle = ImageButton.CreateViewButtonStyle(Color.Transparent);
-         retButton.SelectedButtonStyle =
-            ImageButton.CreateViewButtonStyle(Color.Transparent, SELECTED_IMAGE_BUTTON_BORDER_WIDTH);
-         retButton.DisabledButtonStyle = ImageButton.CreateViewButtonStyle(Color.Transparent);
-      }
+       retButton.DeselectedButtonStyle = ImageButton.CreateViewButtonStyle(Color.Transparent);
+       retButton.SelectedButtonStyle =
+         ImageButton.CreateViewButtonStyle(Color.Transparent, SELECTED_IMAGE_BUTTON_BORDER_WIDTH);
+       retButton.DisabledButtonStyle = ImageButton.CreateViewButtonStyle(Color.Transparent);
+     }
 
-      public static void SetReverseStyles(this LabelButton retButton)
-      {
-         retButton.DeselectedLabelStyle =
-            LabelButton.CreateLabelStyle(Color.Black, NORMAL_BUTTON_FONT_SIZE, FontAttributes.None);
-         retButton.SelectedLabelStyle =
-            LabelButton.CreateLabelStyle(Color.White, SELECTED_BUTTON_FONT_SIZE, FontAttributes.Bold);
-         retButton.DisabledLabelStyle =
-            LabelButton.CreateLabelStyle(Color.Gray, NORMAL_BUTTON_FONT_SIZE, FontAttributes.None);
+     public static void SetReverseStyles(this LabelButton retButton)
+     {
+       retButton.DeselectedLabelStyle =
+         LabelButton.CreateLabelStyle(Color.Black, NORMAL_BUTTON_FONT_SIZE, FontAttributes.None);
+       retButton.SelectedLabelStyle =
+         LabelButton.CreateLabelStyle(Color.White, SELECTED_BUTTON_FONT_SIZE, FontAttributes.Bold);
+       retButton.DisabledLabelStyle =
+         LabelButton.CreateLabelStyle(Color.Gray, NORMAL_BUTTON_FONT_SIZE, FontAttributes.None);
 
-         retButton.DeselectedButtonStyle = LabelButton.CreateViewButtonStyle(Color.Transparent);
-         retButton.SelectedButtonStyle = LabelButton.CreateViewButtonStyle(Color.Black);
-         retButton.DisabledButtonStyle = LabelButton.CreateViewButtonStyle(Color.Transparent);
-      }
+       retButton.DeselectedButtonStyle = LabelButton.CreateViewButtonStyle(Color.Transparent);
+       retButton.SelectedButtonStyle = LabelButton.CreateViewButtonStyle(Color.Black);
+       retButton.DisabledButtonStyle = LabelButton.CreateViewButtonStyle(Color.Transparent);
+     }
 
-      #endregion Public Methods
+     #endregion Public Methods
    }
 }

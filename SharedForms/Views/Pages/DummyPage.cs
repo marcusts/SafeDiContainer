@@ -33,22 +33,22 @@ namespace SharedForms.Views.Pages
 
    public class DummyPage : MenuNavPageBase<IDummyPageViewModel>
    {
-      #region Public Constructors
+     #region Public Constructors
 
-      public DummyPage()
-      {
-         BackgroundColor = ColorUtils.MAIN_PAGE_BACKGROUND_COLOR;
-      }
+     public DummyPage()
+     {
+       BackgroundColor = ColorUtils.MAIN_PAGE_BACKGROUND_COLOR;
+     }
 
-      #endregion Public Constructors
+     #endregion Public Constructors
 
-      #region Protected Methods
+     #region Protected Methods
 
-      protected override View ConstructPageView()
-      {
-         return new ContentView();
-      }
+     protected override View ConstructPageView()
+     {
+       return new ContentView();
+     }
 
-      #endregion Protected Methods
+     #endregion Protected Methods
    }
 }

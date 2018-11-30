@@ -38,118 +38,118 @@ namespace SharedUtils
    /// </remarks>
    public static class WeakEventManager
    {
-      /// <summary>
-      /// This overload handles any type of EventHandler
-      /// </summary>
-      /// <typeparam name="T">The type of the T.</typeparam>
-      /// <typeparam name="TDelegate">The type of the T delegate.</typeparam>
-      /// <typeparam name="TArgs">The type of the T args.</typeparam>
-      /// <param name="subscriber">The subscriber.</param>
-      /// <param name="converter">The converter.</param>
-      /// <param name="add">The add.</param>
-      /// <param name="remove">The remove.</param>
-      /// <param name="action">The action.</param>
-      public static void SetAnyHandler<T, TDelegate, TArgs>
-         (
-            this T subscriber,
-            Func<EventHandler<TArgs>, TDelegate> converter,
-            Action<TDelegate> add,
-            Action<TDelegate> remove,
-            Action<T, TArgs> action
-         )
-         where TArgs : EventArgs
-         where TDelegate : class
-         where T : class
-      {
-         if (converter == null)
-         {
-            throw new ArgumentException("WeakEventManager: SetAnyHandler: Converter cannot be null.");
-         }
-
-         var subsWeakRef = new WeakReference(subscriber);
-         TDelegate handler = null;
-
-         handler = 
-            converter?.Invoke
-               (
-                  new EventHandler<TArgs>
-                     (
-                        (s, e) =>
-                        {
-                           var subsStrongRef = subsWeakRef.Target as T;
-                           if (subsStrongRef != null)
-                           {
-                              action?.Invoke(subsStrongRef, e);
-                           }
-                           else
-                           {
-                              if (handler != null)
-                              {
-                                 remove?.Invoke(handler);
-                                 handler = null;
-                              }
-                           }
-                        }
-                     )
-               );
-
-         add?.Invoke(handler);
-      }
-
-      /// <summary>
-      /// this overload is simplified for generic EventHandlers
-      /// </summary>
-      /// <typeparam name="T">The type of the T.</typeparam>
-      /// <typeparam name="TArgs">The type of the T args.</typeparam>
-      /// <param name="subscriber">The subscriber.</param>
-      /// <param name="add">The add.</param>
-      /// <param name="remove">The remove.</param>
-      /// <param name="action">The action.</param>
-      public static void SetAnyHandler<T, TArgs>
-      (
+     /// <summary>
+     /// This overload handles any type of EventHandler
+     /// </summary>
+     /// <typeparam name="T">The type of the T.</typeparam>
+     /// <typeparam name="TDelegate">The type of the T delegate.</typeparam>
+     /// <typeparam name="TArgs">The type of the T args.</typeparam>
+     /// <param name="subscriber">The subscriber.</param>
+     /// <param name="converter">The converter.</param>
+     /// <param name="add">The add.</param>
+     /// <param name="remove">The remove.</param>
+     /// <param name="action">The action.</param>
+     public static void SetAnyHandler<T, TDelegate, TArgs>
+       (
          this T subscriber,
-         Action<EventHandler<TArgs>> add,
-         Action<EventHandler<TArgs>> remove,
+         Func<EventHandler<TArgs>, TDelegate> converter,
+         Action<TDelegate> add,
+         Action<TDelegate> remove,
          Action<T, TArgs> action
-      )
-         where TArgs : EventArgs
-         where T : class
-      {
-         SetAnyHandler<T, EventHandler<TArgs>, TArgs>
-            (
-               subscriber,                     
-               h => h,                     
-               add,                     
-               remove,                     
-               action
-            );
-      }             
+       )
+       where TArgs : EventArgs
+       where TDelegate : class
+       where T : class
+     {
+       if (converter == null)
+       {
+         throw new ArgumentException("WeakEventManager: SetAnyHandler: Converter cannot be null.");
+       }
 
-      /// <summary>
-      /// this overload is simplified for EventHandlers.
-      /// </summary>
-      /// <typeparam name="T">The type of the T.</typeparam>
-      /// <param name="subscriber">The subscriber.</param>
-      /// <param name="add">The add.</param>
-      /// <param name="remove">The remove.</param>
-      /// <param name="action">The action.</param>
-      public static void SetAnyHandler<T>
-         (
-            this T subscriber,
-            Action<EventHandler> add, 
-            Action<EventHandler> remove,                 
-            Action<T, EventArgs> action
-         )                 
-         where T : class
-      {
-         SetAnyHandler<T, EventHandler, EventArgs>
+       var subsWeakRef = new WeakReference(subscriber);
+       TDelegate handler = null;
+
+       handler = 
+         converter?.Invoke
             (
-               subscriber,                     
-               h => (o, e) => h?.Invoke(o, e), //This is a workaround from Rx
-               add,                     
-               remove,                     
-               action
+              new EventHandler<TArgs>
+                (
+                  (s, e) =>
+                  {
+                     var subsStrongRef = subsWeakRef.Target as T;
+                     if (subsStrongRef != null)
+                     {
+                       action?.Invoke(subsStrongRef, e);
+                     }
+                     else
+                     {
+                       if (handler != null)
+                       {
+                         remove?.Invoke(handler);
+                         handler = null;
+                       }
+                     }
+                  }
+                )
             );
-      }
+
+       add?.Invoke(handler);
+     }
+
+     /// <summary>
+     /// this overload is simplified for generic EventHandlers
+     /// </summary>
+     /// <typeparam name="T">The type of the T.</typeparam>
+     /// <typeparam name="TArgs">The type of the T args.</typeparam>
+     /// <param name="subscriber">The subscriber.</param>
+     /// <param name="add">The add.</param>
+     /// <param name="remove">The remove.</param>
+     /// <param name="action">The action.</param>
+     public static void SetAnyHandler<T, TArgs>
+     (
+       this T subscriber,
+       Action<EventHandler<TArgs>> add,
+       Action<EventHandler<TArgs>> remove,
+       Action<T, TArgs> action
+     )
+       where TArgs : EventArgs
+       where T : class
+     {
+       SetAnyHandler<T, EventHandler<TArgs>, TArgs>
+         (
+            subscriber,                
+            h => h,                
+            add,                
+            remove,                
+            action
+         );
+     }          
+
+     /// <summary>
+     /// this overload is simplified for EventHandlers.
+     /// </summary>
+     /// <typeparam name="T">The type of the T.</typeparam>
+     /// <param name="subscriber">The subscriber.</param>
+     /// <param name="add">The add.</param>
+     /// <param name="remove">The remove.</param>
+     /// <param name="action">The action.</param>
+     public static void SetAnyHandler<T>
+       (
+         this T subscriber,
+         Action<EventHandler> add, 
+         Action<EventHandler> remove,             
+         Action<T, EventArgs> action
+       )             
+       where T : class
+     {
+       SetAnyHandler<T, EventHandler, EventArgs>
+         (
+            subscriber,                
+            h => (o, e) => h?.Invoke(o, e), //This is a workaround from Rx
+            add,                
+            remove,                
+            action
+         );
+     }
    }
 }

@@ -32,66 +32,66 @@ namespace SharedForms.Common.Utils
 
    public static class BindableUtils
    {
-      #region Public Methods
+     #region Public Methods
 
-      public static BindableProperty CreateBindableProperty<T, U>
-      (
-         string localPropName,
-         U defaultVal = default(U),
-         BindingMode bindingMode = BindingMode.OneWay,
-         Action<T, U, U> callbackAction = null
-      )
-         where T : class
-      {
-         return BindableProperty.Create
-         (
-            localPropName,
-            typeof(U),
-            typeof(T),
-            defaultVal,
-            bindingMode,
-            propertyChanged: (bindable, oldVal, newVal) =>
+     public static BindableProperty CreateBindableProperty<T, U>
+     (
+       string localPropName,
+       U defaultVal = default(U),
+       BindingMode bindingMode = BindingMode.OneWay,
+       Action<T, U, U> callbackAction = null
+     )
+       where T : class
+     {
+       return BindableProperty.Create
+       (
+         localPropName,
+         typeof(U),
+         typeof(T),
+         defaultVal,
+         bindingMode,
+         propertyChanged: (bindable, oldVal, newVal) =>
+         {
+            if (callbackAction != null)
             {
-               if (callbackAction != null)
-               {
-                  var bindableAsOverlayButton = bindable as T;
-                  if (bindableAsOverlayButton != null)
-                  {
-                     callbackAction(bindableAsOverlayButton, (U) oldVal, (U) newVal);
-                  }
-               }
-            });
-      }
+              var bindableAsOverlayButton = bindable as T;
+              if (bindableAsOverlayButton != null)
+              {
+                callbackAction(bindableAsOverlayButton, (U) oldVal, (U) newVal);
+              }
+            }
+         });
+     }
 
-      public static BindableProperty CreateReadOnlyBindableProperty<T, U>
-      (
-         string localPropName,
-         U defaultVal = default(U),
-         BindingMode bindingMode = BindingMode.OneWay,
-         Action<T, U, U> callbackAction = null
-      )
-         where T : class
-      {
-         return BindableProperty.CreateReadOnly
-         (
-            localPropName,
-            typeof(U),
-            typeof(T),
-            defaultVal,
-            bindingMode,
-            propertyChanged: (bindable, oldVal, newVal) =>
+     public static BindableProperty CreateReadOnlyBindableProperty<T, U>
+     (
+       string localPropName,
+       U defaultVal = default(U),
+       BindingMode bindingMode = BindingMode.OneWay,
+       Action<T, U, U> callbackAction = null
+     )
+       where T : class
+     {
+       return BindableProperty.CreateReadOnly
+       (
+         localPropName,
+         typeof(U),
+         typeof(T),
+         defaultVal,
+         bindingMode,
+         propertyChanged: (bindable, oldVal, newVal) =>
+         {
+            if (callbackAction != null)
             {
-               if (callbackAction != null)
-               {
-                  var bindableAsOverlayButton = bindable as T;
-                  if (bindableAsOverlayButton != null)
-                  {
-                     callbackAction(bindableAsOverlayButton, (U) oldVal, (U) newVal);
-                  }
-               }
-            }).BindableProperty;
-      }
+              var bindableAsOverlayButton = bindable as T;
+              if (bindableAsOverlayButton != null)
+              {
+                callbackAction(bindableAsOverlayButton, (U) oldVal, (U) newVal);
+              }
+            }
+         }).BindableProperty;
+     }
 
-      #endregion Public Methods
+     #endregion Public Methods
    }
 }

@@ -6,18 +6,20 @@
 
   <ItemGroup>
     <PackageReference Include="Acr.UserDialogs" Version="7.0.1" />
-    <PackageReference Include="Fody" Version="3.0.3" />
-    <PackageReference Include="PropertyChanged.Fody" Version="2.5.4" />
-    <PackageReference Include="Xamarin.Forms" Version="2.5.1.444934" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\SharedForms\SharedForms.csproj" />
-    <ProjectReference Include="..\SharedUtils\SharedUtils.csproj" />
+    <PackageReference Include="Fody" Version="3.3.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="PropertyChanged.Fody" Version="2.6.0" />
+    <PackageReference Include="Xamarin.Forms" Version="3.4.0.1008975" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Update="NETStandard.Library" Version="2.0.2" />
   </ItemGroup>
+
+  <Import Project="..\MtsShared\SharedForms\SharedForms.projitems" Label="Shared" />
+
+  <Import Project="..\MtsShared\SharedUtils\SharedUtils.projitems" Label="Shared" />
 
 </Project>

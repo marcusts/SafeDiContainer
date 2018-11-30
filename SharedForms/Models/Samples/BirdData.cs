@@ -25,11 +25,11 @@ namespace SharedForms.Models.Samples
 {
    public class BirdData : AnimalDataBase, IBirdData
    {
-      #region Protected Properties
+     #region Protected Properties
 
-      protected override string AnimalPrefix => "bird";
+     protected override string AnimalPrefix => "bird";
 
-      #endregion Protected Properties
+     #endregion Protected Properties
    }
 
    public interface IBirdData

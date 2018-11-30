@@ -25,10 +25,10 @@ namespace SharedForms.Common.Interfaces.Samples
 {
    public interface IMakeBigDecisions
    {
-      #region Public Properties
+     #region Public Properties
 
-      bool IAmBig { get; set; }
+     bool IAmBig { get; set; }
 
-      #endregion Public Properties
+     #endregion Public Properties
    }
 }

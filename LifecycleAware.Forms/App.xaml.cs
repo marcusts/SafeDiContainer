@@ -1,47 +1,41 @@
-﻿#region License
-
-// MIT License
-// 
-// Copyright (c) 2018 
-// Marcus Technical Services, Inc.
-// http://www.marcusts.com
-// 
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-// 
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-
-#endregion
+﻿// MIT License
+//
+// Copyright (c) 2018 Marcus Technical Services, Inc. http://www.marcusts.com
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+// documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
+// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+// WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 namespace LifecycleAware.Forms
 {
-   #region Imports
-
    using System;
    using System.Diagnostics;
    using System.Threading.Tasks;
    using System.Timers;
-   using Lib;
+   using Lib.Common.Interfaces;
    using SharedForms.Common.Utils;
    using Xamarin.Forms;
 
-   #endregion
-
-   public partial class App : Application, IManagePageChanges
+   public partial class App : Application, IManagePageChanges, IReportAppLifecycle
    {
+      #region Private Fields
+
+      private static readonly double DELAY_BETWEEN_BROADCASTS = 1000;
+
+      private static readonly TimeSpan TOTAL_BROADCAST_TIME = TimeSpan.FromSeconds(30);
+
+      private Timer _timer;
+
+      #endregion Private Fields
+
       #region Public Constructors
 
       public App()
@@ -56,15 +50,26 @@ namespace LifecycleAware.Forms
 
       #endregion Public Constructors
 
+      #region Public Events
+
+      public event EventUtils.NoParamsDelegate AppIsGoingToSleep;
+
+      public event EventUtils.NoParamsDelegate AppIsResuming;
+
+      public event EventUtils.NoParamsDelegate AppIsStarting;
+
+      #endregion Public Events
+
+      #region Private Events
+
+      private event EventUtils.NoParamsDelegate TestCompleted;
+
+      #endregion Private Events
+
       #region Public Methods
 
       public void SetMainPage(Page newPage)
       {
-         if (MainPage is ICanAppearAndDisappear lastPageAsAppearDisappear)
-         {
-            lastPageAsAppearDisappear.ForceOnDisappearing();
-         }
-
          try
          {
             MainPage = newPage;
@@ -73,46 +78,23 @@ namespace LifecycleAware.Forms
          {
             Console.WriteLine(e);
          }
-
-         if (MainPage is ICanAppearAndDisappear nextPageAsAppearDisappear)
-         {
-            nextPageAsAppearDisappear.ForceOnAppearing();
-         }
       }
 
       #endregion Public Methods
 
-      #region Private Events
-
-      private event EventUtils.NoParamsDelegate TestCompleted;
-
-      #endregion Private Events
-
-      #region Private Variables
-
-      private static readonly double DELAY_BETWEEN_BROADCASTS = 1000;
-
-      private static readonly TimeSpan TOTAL_BROADCAST_TIME = TimeSpan.FromSeconds(30);
-      private Timer _timer;
-
-      #endregion Private Variables
-
       #region Protected Methods
 
-      protected override void OnResume()
-      {
+      protected override void OnResume() =>
          // Handle when your app resumes
-      }
+         AppIsResuming?.Invoke();
 
-      protected override void OnSleep()
-      {
+      protected override void OnSleep() =>
          // Handle when your app sleeps
-      }
+         AppIsGoingToSleep?.Invoke();
 
-      protected override void OnStart()
-      {
+      protected override void OnStart() =>
          // Handle when your app starts
-      }
+         AppIsStarting?.Invoke();
 
       #endregion Protected Methods
 
@@ -186,7 +168,7 @@ namespace LifecycleAware.Forms
 
             var firstViewModelWithLifecycle = new FirstViewModelWithLifecycle();
             var firstPageWithLifecycle = new FirstPageWithLifecycle { BindingContext = firstViewModelWithLifecycle };
-            firstViewModelWithLifecycle.LifecycleReporter = firstPageWithLifecycle;
+            firstViewModelWithLifecycle.PageLifecycleReporter = firstPageWithLifecycle;
             Debug.WriteLine("About to assign the main page to the first page with Lifecycle.");
             SetMainPage(firstPageWithLifecycle);
 

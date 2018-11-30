@@ -31,29 +31,29 @@ namespace SharedForms.Common.DeviceServices
 
    public static class OrientationService
    {
-      #region Public Methods
+     #region Public Methods
 
-      public static void HandleDeviceSizeChanged(object sender, LocalDeviceSizeChangedMessage message)
-      {
-         // Need the initial orientation
-         ScreenWidth = message.Payload.ScreenWidth;
-         ScreenHeight = message.Payload.ScreenHeight;
-         IsLandscape = ScreenWidth > ScreenHeight;
+     public static void HandleDeviceSizeChanged(object sender, LocalDeviceSizeChangedMessage message)
+     {
+       // Need the initial orientation
+       ScreenWidth = message.Payload.ScreenWidth;
+       ScreenHeight = message.Payload.ScreenHeight;
+       IsLandscape = ScreenWidth > ScreenHeight;
 
-         // Notify the app classes about this change.
-         FormsMessengerUtils.Send(new BroadcastDeviceSizeChangedMessage(ScreenWidth, ScreenHeight));
-      }
+       // Notify the app classes about this change.
+       FormsMessengerUtils.Send(new BroadcastDeviceSizeChangedMessage(ScreenWidth, ScreenHeight));
+     }
 
-      #endregion Public Methods
+     #endregion Public Methods
 
-      #region Public Properties
+     #region Public Properties
 
-      public static bool IsLandscape { get; set; }
+     public static bool IsLandscape { get; set; }
 
-      public static float ScreenHeight { get; set; }
+     public static float ScreenHeight { get; set; }
 
-      public static float ScreenWidth { get; set; }
+     public static float ScreenWidth { get; set; }
 
-      #endregion Public Properties
+     #endregion Public Properties
    }
 }

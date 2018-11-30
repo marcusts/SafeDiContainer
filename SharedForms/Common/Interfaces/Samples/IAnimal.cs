@@ -31,14 +31,14 @@ namespace SharedForms.Common.Interfaces.Samples
 
    public interface IAnimal : IMakeBigDecisions
    {
-      #region Public Properties
+     #region Public Properties
 
-      string LikeToEat { get; }
-      Command MakeNoiseCommand { get; }
-      Command MoveCommand { get; }
-      string MyImageSource { get; }
-      string WhatAmI { get; }
+     string LikeToEat { get; }
+     Command MakeNoiseCommand { get; }
+     Command MoveCommand { get; }
+     string MyImageSource { get; }
+     string WhatAmI { get; }
 
-      #endregion Public Properties
+     #endregion Public Properties
    }
 }

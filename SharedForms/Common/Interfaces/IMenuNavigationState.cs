@@ -28,25 +28,25 @@ namespace SharedForms.Common.Interfaces
    /// </summary>
    public interface IMenuNavigationState
    {
-      #region Public Properties
+     #region Public Properties
 
-      /// <summary>
-      /// The app state to navigate to
-      /// </summary>
-      string AppState { get; }
+     /// <summary>
+     /// The app state to navigate to
+     /// </summary>
+     string AppState { get; }
 
-      int MenuOrder { get; }
+     int MenuOrder { get; }
 
-      /// <summary>
-      /// The menu title
-      /// </summary>
-      string MenuTitle { get; }
+     /// <summary>
+     /// The menu title
+     /// </summary>
+     string MenuTitle { get; }
 
-      /// <summary>
-      /// The page or view title (default: centered on the page)
-      /// </summary>
-      string ViewTitle { get; }
+     /// <summary>
+     /// The page or view title (default: centered on the page)
+     /// </summary>
+     string ViewTitle { get; }
 
-      #endregion Public Properties
+     #endregion Public Properties
    }
 }
