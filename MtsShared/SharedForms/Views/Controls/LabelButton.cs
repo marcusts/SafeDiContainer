@@ -21,6 +21,8 @@
 
 #endregion License
 
+using SharedUtils.Interfaces;
+
 namespace SharedForms.Views.Controls
 {
    #region Imports

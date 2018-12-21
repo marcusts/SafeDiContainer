@@ -13,11 +13,11 @@
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
 // NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// NON-INFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT
 // OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-namespace SharedForms.Common.Interfaces
+namespace SharedUtils.Interfaces
 {
    using System;
 
@@ -30,7 +30,7 @@ namespace SharedForms.Common.Interfaces
       /// <remarks>
       /// The function is better than a property when there is a chance of nesting to view inside
       /// view, etc. Whenever this property is assigned, it will always seek a legal value.
-      /// Otherwise, an assignment might begin with null ands then never change. The root of these
+      /// Otherwise, an assignment might begin with null and then never change. The root of these
       /// events is a known, valid page that should be seekable by any deriver or nested deriver.
       /// </remarks>
       Func<object> GetEventBroadcaster { get; }

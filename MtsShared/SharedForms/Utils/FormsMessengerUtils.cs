@@ -17,10 +17,11 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT
 // OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using SharedUtils.Interfaces;
+
 namespace SharedForms.Common.Utils
 {
    using System;
-   using Interfaces;
    using ViewModels;
    using Xamarin.Forms;
 

@@ -1,10 +1,11 @@
-﻿namespace SmartDIWithLifeCycle.MSTests
+﻿using SharedUtils.Utils;
+
+namespace SmartDIWithLifeCycle.MSTests
 {
    using System;
    using System.Collections.Generic;
    using System.Linq;
    using Microsoft.VisualStudio.TestTools.UnitTesting;
-   using SharedForms.Common.Utils;
    using SmartDI.Lib;
    using TestClasses;
 
@@ -145,27 +146,27 @@
       {
          _container.ExposedThrowOnMultipleRegisteredTypesForOneResolvedType = false;
 
-         // NOTE: The registered types are sorted, so DerivedSimpleClass ends up in front of SimpleClass.
-         //      Without a conflict resolver, the container will make the first available choice: the DerivedSimpleClass.
+         // NOTE: The registered types are sorted by the date and time they are added,
+         //       so DerivedSimpleClass ends up in front of SimpleClass.
+         //       Without a conflict resolver, the container will make the first available choice: the DerivedSimpleClass.
          _container.RegisterTypeAsInterface<DerivedSimpleClass>(typeof(IAmSimple));
          _container.RegisterTypeAsInterface<SimpleClass>(typeof(IAmSimple));
 
          // Ask to derive the interface without using a conflict resolver
          var simple = _container.Resolve<IAmSimple>();
          Assert.IsTrue(simple is DerivedSimpleClass,
-           "Was given the second registered type randomly by the container without a conflict resolver.");
+           "Was given the wrong registered type when I failed to provide a conflict resolver.");
 
-         // Now use the conflict resolver to make the choice -- forbid the DerivedSimpleClassss
+         // Now use the conflict resolver to make the choice -- forbid the DerivedSimpleClass
          simple =
            _container.Resolve<IAmSimple>
               (
                 StorageRules.AnyAccessLevel,
                 null,
-                ForbidDerivedSimpleClass
+                ForbidSpecificClass<DerivedSimpleClass>
               );
 
-         Assert.IsFalse(simple is DerivedSimpleClass,
-           "Was given the first registered type when the resolver asked for the second one.");
+         Assert.IsFalse(simple is DerivedSimpleClass, "Was given the a type that was forbidden by the resolver.");
       }
 
       [TestMethod]
@@ -286,16 +287,16 @@
 
          // These three statements should now be true
          Assert.IsTrue(_container.ExposedRegisteredTypeContracts.ContainsKey(typeof(SimpleClass)));
-         Assert.IsTrue(_container.ExposedRegisteredTypeContracts[typeof(SimpleClass)].Keys.Contains(typeof(SimpleClass)));
-         Assert.IsTrue(_container.ExposedRegisteredTypeContracts[typeof(SimpleClass)].Values.Count == 1);
+         Assert.IsTrue(_container.ExposedRegisteredTypeContracts[typeof(SimpleClass)].CreatorsAndStorageRules.Keys.Contains(typeof(SimpleClass)));
+         Assert.IsTrue(_container.ExposedRegisteredTypeContracts[typeof(SimpleClass)].CreatorsAndStorageRules.Values.Count == 1);
 
          // Now try to register again using a different constructor for the same type.
          _container.RegisterType<SimpleClass>(StorageRules.DoNotStore, SimpleClass_Static.CreateSimpleInstance);
 
          // Retest; the conditions should not change, because we cannot legally add two constructors for the same type and storage rule.
          Assert.IsTrue(_container.ExposedRegisteredTypeContracts.ContainsKey(typeof(SimpleClass)));
-         Assert.IsTrue(_container.ExposedRegisteredTypeContracts[typeof(SimpleClass)].Keys.Contains(typeof(SimpleClass)));
-         Assert.IsTrue(_container.ExposedRegisteredTypeContracts[typeof(SimpleClass)].Values.Count == 1);
+         Assert.IsTrue(_container.ExposedRegisteredTypeContracts[typeof(SimpleClass)].CreatorsAndStorageRules.Keys.Contains(typeof(SimpleClass)));
+         Assert.IsTrue(_container.ExposedRegisteredTypeContracts[typeof(SimpleClass)].CreatorsAndStorageRules.Values.Count == 1);
          // NOTE that no error is issued; the new rule over-writes the old one.
 
          // The bound storage rules are complex, so require specialized testing
@@ -378,18 +379,22 @@
 
       #region Private Methods
 
-      private static ConflictResolution ForbidDerivedSimpleClass(IDictionary<Type, IDictionary<Type, IProvideCreatorAndStorageRule>> registrations)
+      private static IConflictResolution ForbidSpecificClass<T>(IDictionary<Type, ITimeStampedCreatorAndStorageRules> registrations)
       {
-         foreach (var registration in registrations.Where(r => r.Key != typeof(DerivedSimpleClass)))
+         // Find any registration where the key (the main class that was registered and that is being constructed)
+         //    is *not* the forbidden one
+         var legalValues = registrations.Where(r => r.Key != typeof(T)).ToArray();
+
+         if (legalValues.IsEmpty())
          {
-            return new ConflictResolution()
-            {
-               MasterType = registration.Key,
-               TypeToCastWithStorageRule = registration.Value.First()
-            };
+            return null;
          }
 
-         return null;
+         return new ConflictResolution()
+         {
+            MasterType = legalValues.First().Key,
+            TypeToCastWithStorageRule = legalValues.First().Value.CreatorsAndStorageRules.First()
+         };
       }
 
       private void AssertContainerHasRaisedNoExceptions()

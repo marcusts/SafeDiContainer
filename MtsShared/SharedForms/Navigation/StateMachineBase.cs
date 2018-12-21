@@ -22,6 +22,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using SharedUtils.Interfaces;
+using SharedUtils.Utils;
+
 namespace SharedForms.Common.Navigation
 {
    using System;

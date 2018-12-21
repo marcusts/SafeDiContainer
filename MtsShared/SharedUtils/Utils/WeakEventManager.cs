@@ -16,13 +16,13 @@
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
 // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace SharedUtils
+namespace SharedUtils.Utils
 {
    using System;
 
@@ -64,31 +64,27 @@ namespace SharedUtils
             throw new ArgumentException("WeakEventManager: SetAnyHandler: Converter cannot be null.");
          }
 
-         var subsWeakRef = new WeakReference(subscriber);
+         var weakReferenceSubscriber = new WeakReference(subscriber);
          TDelegate handler = null;
 
          handler =
-           converter?.Invoke
+           converter.Invoke
               (
-                new EventHandler<TArgs>
-                  (
-                    (s, e) =>
-                    {
-                       var subsStrongRef = subsWeakRef.Target as T;
-                       if (subsStrongRef != null)
-                       {
-                          action?.Invoke(subsStrongRef, e);
-                       }
-                       else
-                       {
-                          if (handler != null)
-                          {
-                             remove?.Invoke(handler);
-                             handler = null;
-                          }
-                       }
-                    }
-                  )
+                (s, e) =>
+                {
+                   if (weakReferenceSubscriber.Target is T subsStrongRef)
+                   {
+                      action?.Invoke(subsStrongRef, e);
+                   }
+                   else
+                   {
+                      if (handler != null)
+                      {
+                         remove?.Invoke(handler);
+                         handler = null;
+                      }
+                   }
+                }
               );
 
          add?.Invoke(handler);
@@ -111,7 +107,7 @@ namespace SharedUtils
         Action<T, TArgs> action
       )
         where TArgs : EventArgs
-        where T : class => SetAnyHandler<T, EventHandler<TArgs>, TArgs>
+        where T : class => SetAnyHandler
           (
              subscriber,
              h => h,
@@ -135,7 +131,7 @@ namespace SharedUtils
           Action<EventHandler> remove,
           Action<T, EventArgs> action
         )
-        where T : class => SetAnyHandler<T, EventHandler, EventArgs>
+        where T : class => SetAnyHandler
           (
              subscriber,
              h => (o, e) => h?.Invoke(o, e), //This is a workaround from Rx

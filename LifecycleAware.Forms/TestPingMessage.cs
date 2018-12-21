@@ -22,6 +22,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using SharedUtils.Navigation;
+
 namespace LifecycleAware.Forms
 {
    using SharedForms.Common.Navigation;

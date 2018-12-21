@@ -13,11 +13,11 @@
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
 // NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// NON-INFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT
 // OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-namespace SharedForms.Common.Utils
+namespace SharedUtils.Utils
 {
    using System;
    using System.Collections.Concurrent;
@@ -30,110 +30,6 @@ namespace SharedForms.Common.Utils
       private const double NUMERIC_ERROR = 0.001;
 
       public static bool? EmptyNullableBool => new bool?();
-
-      //public static readonly Random GLOBAL_RANDOM = new Random((int)DateTime.Now.Ticks & 0x0000FFFF);
-
-      //private const double NUMERIC_ERROR = 0.001;
-
-      //public const string TRUE_STR = "true";
-
-      //public const string FALSE_STR = "false";
-
-      //public static bool? EmptyNullableBool => new bool?();
-
-      //public static bool IsSameAs(this double mainD, double otherD)
-      //{
-      //   return Math.Abs(mainD - otherD) < NUMERIC_ERROR;
-      //}
-
-      //public static bool IsDifferentThan(this double mainD, double otherD)
-      //{
-      //   return !IsSameAs(mainD, otherD);
-      //}
-
-      //public static bool IsEmpty(this double mainD)
-      //{
-      //   return IsSameAs(mainD, 0);
-      //}
-
-      //public static bool IsNotEmpty(this double mainD)
-      //{
-      //   return !IsEmpty(mainD);
-      //}
-
-      //public static bool IsSameAs(this float mainF, float otherF)
-      //{
-      //   return Math.Abs(mainF - otherF) < NUMERIC_ERROR;
-      //}
-
-      //public static bool IsDifferentThan(this float mainF, float otherF)
-      //{
-      //   return !IsSameAs(mainF, otherF);
-      //}
-
-      //public static bool IsEmpty(this string str)
-      //{
-      //   return String.IsNullOrWhiteSpace(str);
-      //}
-
-      //public static bool IsNotEmpty(this string str)
-      //{
-      //   return !IsEmpty(str);
-      //}
-
-      //public static bool IsEmpty<T>(this IEnumerable<T> list)
-      //{
-      //   return list == null || !list.Any();
-      //}
-
-      //public static bool IsNotEmpty<T>(this IEnumerable<T> list)
-      //{
-      //   return !IsEmpty(list);
-      //}
-
-      //public static bool IsSameAs(this string mainStr, string otherStr)
-      //{
-      //   return String.Compare(mainStr, otherStr, StringComparison.CurrentCultureIgnoreCase) == 0;
-      //}
-
-      //public static bool IsDifferentThan(this string mainStr, string otherStr)
-      //{
-      //   return !IsSameAs(mainStr, otherStr);
-      //}
-
-      //public static int RoundToInt(this double floatVal)
-      //{
-      //   return (int) Math.Round(floatVal, 0);
-      //}
-
-      //public static bool IsLessThanOrEqualTo(this double thisD, double otherD)
-      //{
-      //   return IsSameAs(thisD, otherD) || thisD < otherD;
-      //}
-
-      //public static bool IsGreaterThanOrEqualTo(this double thisD, double otherD)
-      //{
-      //   return IsSameAs(thisD, otherD) || thisD > otherD;
-      //}
-
-      //public static bool IsTrue(this bool? b)
-      //{
-      //   return b.HasValue && b.Value;
-      //}
-
-      //public static bool IsNotTheSame(this bool? first, bool? second)
-      //{
-      //   return first == null != (second == null)
-      //        ||
-      //        IsNotAnEqualObjectTo(first, second);
-      //}
-
-      //public static bool IsNonNullRegexMatch(this string s, string regex)
-      //{
-      //   return s != null && Regex.IsMatch(s, regex, RegexOptions.IgnoreCase);
-      //}
-
-      public static void AddOrUpdate<T, U>(this ConcurrentDictionary<T, U> retDict, T key, U value) => retDict.AddOrUpdate(key, value, (k, v) => v);
 
       /// <summary>
       /// Determines if two collections of properties contain the same actual values. Can be called
@@ -262,104 +158,6 @@ namespace SharedForms.Common.Utils
          return propertyInfos.ToArray();
       }
 
-      //public static bool IsAnEqualReferenceTo<T>(this T mainObj, T compareObj)
-      //   where T : class
-      //{
-      //   return
-      //     (mainObj == null && compareObj == null)
-      //     ||
-      //     (
-      //       ((mainObj == null) == (compareObj == null))
-      //       &&
-      //       (ReferenceEquals(compareObj, mainObj))
-      //     );
-      //}
-
-      //public static bool IsNotAnEqualReferenceTo(this object mainObj, object compareObj)
-      //{
-      //   return !IsAnEqualReferenceTo(mainObj, compareObj);
-      //}
-
-      //public static bool IsAnEqualObjectTo(this object mainObj, object compareObj)
-      //{
-      //   return
-      //     mainObj == null && compareObj == null
-      //     ||
-      //     mainObj != null && mainObj.Equals(compareObj)
-      //     ||
-      //     compareObj != null && compareObj.Equals(mainObj);
-      //}
-
-      //public static bool IsNotAnEqualObjectTo(this object mainObj, object compareObj)
-      //{
-      //   return !IsAnEqualObjectTo(mainObj, compareObj);
-      //}
-
-      // public static PropertyInfo[] CleanPropInfos(this PropertyInfo[] propInfos, params string[]
-      // namesToRemove) { if (IsEmpty(namesToRemove)) { return propInfos; }
-
-      // var retPropInfoList = new List<PropertyInfo>();
-
-      // foreach (var propInfo in propInfos) { var foundPropInfo = namesToRemove.FirstOrDefault(n =>
-      // IsSameAs(n, propInfo.Name));
-
-      // if (foundPropInfo == null) { retPropInfoList.Add(propInfo); } }
-
-      // return retPropInfoList.ToArray(); }
-
-      // /// <summary> /// Copy the values from the specified properties from value to target. ///
-      // </summary> /// <typeparam name="T">*Unused* -- required for referencing only.</typeparam>
-      // /// <param name="targetViewModel">The view model to copy *to*.</param> /// <param
-      // name="valueViewModel">The view model to copy *from*.</param> /// <param name="propInfos">The
-      // property info records to use to get and set values.</param> public static void
-      // CopySettablePropertyValuesFrom<T>(this T targetViewModel, T valueViewModel, params
-      // PropertyInfo[] propInfos) { if (propInfos == null || !propInfos.Any()) { propInfos =
-      // typeof(T).GetRuntimeWriteableProperties(); }
-
-      //       try
-      //       {
-      //         foreach (var propInfo in propInfos)
-      //         {
-      //#if AUDIT_PROP_INFO
-      //            Debug.WriteLine("  About to copy prop info ->" + propInfo.Name + "<-");
-      //#endif
-
-      //#if MANAGE_MODES_COPY
-      //            if (propInfo.PropertyType == typeof(Modes))
-      //            {
-      //              var mode = propInfo.GetValue(valueViewModel);
-      //              propInfo.SetValue(targetViewModel, mode);
-      //            }
-      //            else
-      //            {
-      //#endif
-      //              propInfo.SetValue(targetViewModel, propInfo.GetValue(valueViewModel));
-      //#if MANAGE_MODES_COPY
-      //            }
-      //#endif
-      //public static void ClearWriteableProperties<T>(this T target)
-      //   where T : new()
-      //{
-      //   var propInfos = typeof(T).GetRuntimeWriteableProperties().ToArray();
-
-      // var defaultT = Activator.CreateInstance<T>();
-
-      //   if (IsNotEmpty(propInfos))
-      //   {
-      //     target.CopySettablePropertyValuesFrom(defaultT, propInfos);
-      //   }
-      //}
-
-      //public static bool ToBool(this string boolStr)
-      //{
-      //   return IsSameAs(boolStr, TRUE_STR);
-      //}
-
-      //public static string ToBoolStr(this bool b)
-      //{
-      //   return b ? TRUE_STR : FALSE_STR;
-      //}
-
       public static string GetStringFromObject(object value)
       {
          if (value is string s)
@@ -402,10 +200,6 @@ namespace SharedForms.Common.Utils
 
       public static bool IsGreaterThanOrEqualTo(this double thisD, double otherD) => thisD.IsSameAs(otherD) || thisD > otherD;
 
-      //public static bool IsEmpty<T>(this IEnumerable<T> list)
-      //{
-      //   return list == null || !list.Any();
-      //}
       public static bool IsLessThanOrEqualTo(this double thisD, double otherD) => thisD.IsSameAs(otherD) || thisD < otherD;
 
       public static bool IsNotAnEqualObjectTo(this object mainObj, object compareObj) => !mainObj.IsAnEqualObjectTo(compareObj);
@@ -427,10 +221,6 @@ namespace SharedForms.Common.Utils
 
       public static bool IsSameAs(this DateTime mainDateTime, DateTime otherDateTime) => mainDateTime.CompareTo(otherDateTime) == 0;
 
-      //public static bool IsNotEmpty<T>(this IEnumerable<T> list)
-      //{
-      //   return !list.IsEmpty();
-      //}
       public static bool IsSameAs(this double mainD, double otherD) => Math.Abs(mainD - otherD) < NUMERIC_ERROR;
 
       public static bool IsSameAs(this float mainF, float otherF) => Math.Abs(mainF - otherF) < NUMERIC_ERROR;
@@ -460,16 +250,5 @@ namespace SharedForms.Common.Utils
 
          return string.Empty;
       }
-
-      //public static T GetRandomEnum<T>()
-      //{
-      //   Debug.Assert(typeof(T).IsEnum, "Must pass an enum to GetRandomEnum");
-
-      // var rand = GLOBAL_RANDOM.Next(GetEnumCount<T>());
-
-      // if (Enum.GetValues(typeof(T)) is T[] allValues) { return allValues[rand]; }
-
-      //   return default(T);
-      //}
    }
 }
