@@ -1,0 +1,492 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Com.MarcusTS.LifecycleAware</name>
+    </assembly>
+    <members>
+        <member name="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.ICleanUpBeforeFinalization">
+            <summary>
+            Interface ICleanUpBeforeFinalization
+            </summary>
+        </member>
+        <member name="P:Com.MarcusTS.LifecycleAware.Common.Interfaces.ICleanUpBeforeFinalization.IsCleaningUpBeforeFinalization">
+            <summary>
+            Gets or sets a value indicating whether this instance is cleaning up before finalization.
+            </summary>
+            <value><c>true</c> if this instance is cleaning up before finalization; otherwise, <c>false</c>.</value>
+        </member>
+        <member name="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IHostAppLifecycleReporter">
+            <summary>
+            Interface IHostAppLifecycleReporter
+            </summary>
+        </member>
+        <member name="P:Com.MarcusTS.LifecycleAware.Common.Interfaces.IHostAppLifecycleReporter.AppLifecycleReporter">
+            <summary>
+            Gets or sets the application lifecycle reporter.
+            </summary>
+            <value>The application lifecycle reporter.</value>
+        </member>
+        <member name="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IHostPageLifecycleReporter">
+            <summary>
+            Interface IHostPageLifecycleReporter
+            </summary>
+        </member>
+        <member name="P:Com.MarcusTS.LifecycleAware.Common.Interfaces.IHostPageLifecycleReporter.PageLifecycleReporter">
+            <summary>
+            Gets or sets the page lifecycle reporter.
+            </summary>
+            <value>The page lifecycle reporter.</value>
+        </member>
+        <member name="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IManagePageChanges">
+            <summary>
+            Interface IManagePageChanges
+            </summary>
+        </member>
+        <member name="M:Com.MarcusTS.LifecycleAware.Common.Interfaces.IManagePageChanges.SetMainPage(Xamarin.Forms.Page)">
+            <summary>
+            Sets the main page.
+            </summary>
+            <param name="newPage">The new page.</param>
+        </member>
+        <member name="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IReportAppLifecycle">
+            <summary>
+            Interface IReportAppLifecycle
+            </summary>
+        </member>
+        <member name="E:Com.MarcusTS.LifecycleAware.Common.Interfaces.IReportAppLifecycle.AppIsGoingToSleep">
+            <summary>
+            Occurs when [application is going to sleep].
+            </summary>
+        </member>
+        <member name="E:Com.MarcusTS.LifecycleAware.Common.Interfaces.IReportAppLifecycle.AppIsResuming">
+            <summary>
+            Occurs when [application is resuming].
+            </summary>
+        </member>
+        <member name="E:Com.MarcusTS.LifecycleAware.Common.Interfaces.IReportAppLifecycle.AppIsStarting">
+            <summary>
+            Occurs when [application is starting].
+            </summary>
+        </member>
+        <member name="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IReportPageLifecycle">
+            <summary>
+            Interface IReportPageLifecycle
+            </summary>
+        </member>
+        <member name="E:Com.MarcusTS.LifecycleAware.Common.Interfaces.IReportPageLifecycle.PageIsAppearing">
+            <summary>
+            Occurs when [page is appearing].
+            </summary>
+        </member>
+        <member name="E:Com.MarcusTS.LifecycleAware.Common.Interfaces.IReportPageLifecycle.PageIsDisappearing">
+            <summary>
+            Occurs when [page is disappearing].
+            </summary>
+        </member>
+        <member name="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IRespondToAppStateChanges">
+            <summary>
+            Interface IRespondToAppStateChanges
+            </summary>
+        </member>
+        <member name="E:Com.MarcusTS.LifecycleAware.Common.Interfaces.IRespondToAppStateChanges.AppIsGoingToSleep">
+            <summary>
+            Occurs when [application is going to sleep].
+            </summary>
+        </member>
+        <member name="E:Com.MarcusTS.LifecycleAware.Common.Interfaces.IRespondToAppStateChanges.AppIsResuming">
+            <summary>
+            Occurs when [application is resuming].
+            </summary>
+        </member>
+        <member name="E:Com.MarcusTS.LifecycleAware.Common.Interfaces.IRespondToAppStateChanges.AppIsStarting">
+            <summary>
+            Occurs when [application is starting].
+            </summary>
+        </member>
+        <member name="T:Com.MarcusTS.LifecycleAware.Common.Utils.LifecycleAwareUtils">
+            <summary>
+            Class LifecycleAwareUtils.
+            Implements the <see cref="!:Object" />
+            </summary>
+            <seealso cref="!:Object" />
+        </member>
+        <member name="M:Com.MarcusTS.LifecycleAware.Common.Utils.LifecycleAwareUtils.SendObjectDisappearingMessage(System.Object)">
+            <summary>
+            Sends the object disappearing message.
+            </summary>
+            <param name="obj">The object.</param>
+        </member>
+        <member name="T:Com.MarcusTS.LifecycleAware.ViewModels.IViewModelWithLifecycle">
+            <summary>
+            Interface IViewModelWithLifecycle
+            Implements the <see cref="T:System.ComponentModel.INotifyPropertyChanged" />
+            Implements the <see cref="T:System.ComponentModel.INotifyPropertyChanged" />
+            Implements the <see cref="N:System.ComponentModel" />
+            Implements the <see cref="N:System" />
+            Implements the <see cref="T:System.ComponentModel.INotifyPropertyChanged" />
+            Implements the <see cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IHostAppLifecycleReporter" />
+            Implements the <see cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IHostPageLifecycleReporter" />
+            Implements the <see cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.ICleanUpBeforeFinalization" />
+            Implements the <see cref="T:System.ComponentModel.INotifyPropertyChanged" />
+            </summary>
+            <seealso cref="T:System.ComponentModel.INotifyPropertyChanged" />
+            <seealso cref="T:System.ComponentModel.INotifyPropertyChanged" />
+            <seealso cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IHostAppLifecycleReporter" />
+            <seealso cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IHostPageLifecycleReporter" />
+            <seealso cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.ICleanUpBeforeFinalization" />
+            <seealso cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.ICleanUpBeforeFinalization" />
+            <seealso cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IHostAppLifecycleReporter" />
+            <seealso cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IHostPageLifecycleReporter" />
+            <seealso cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IHostPageLifecycleReporter" />
+        </member>
+        <member name="T:Com.MarcusTS.LifecycleAware.ViewModels.ViewModelWithLifecycle">
+            <summary>
+            Use this as the basis of all view models if possible. If not possible in a few cases, copy this code into your
+            other classes as-is and it will work the same way.
+            Implements the <see cref="T:Com.MarcusTS.LifecycleAware.ViewModels.IViewModelWithLifecycle" />
+            Implements the <see cref="T:Com.MarcusTS.LifecycleAware.ViewModels.IViewModelWithLifecycle" />
+            Implements the <see cref="T:System.Object" />
+            </summary>
+            <seealso cref="T:System.Object" />
+            <seealso cref="T:Com.MarcusTS.LifecycleAware.ViewModels.IViewModelWithLifecycle" />
+            <seealso cref="T:Com.MarcusTS.LifecycleAware.ViewModels.IViewModelWithLifecycle" />
+            <remarks>REMEMBER to set the <see cref="P:Com.MarcusTS.LifecycleAware.ViewModels.ViewModelWithLifecycle.AppLifecycleReporter" /> to the current app and the
+            <see cref="P:Com.MarcusTS.LifecycleAware.ViewModels.ViewModelWithLifecycle.PageLifecycleReporter" /> to the parent page. The event ties are weak and non-binding.</remarks>
+        </member>
+        <member name="E:Com.MarcusTS.LifecycleAware.ViewModels.ViewModelWithLifecycle.PropertyChanged">
+            <summary>
+            Occurs when [property changed].
+            </summary>
+        </member>
+        <member name="M:Com.MarcusTS.LifecycleAware.ViewModels.ViewModelWithLifecycle.Finalize">
+            <summary>
+            Finalizes an instance of the <see cref="T:Com.MarcusTS.LifecycleAware.ViewModels.ViewModelWithLifecycle" /> class.
+            </summary>
+        </member>
+        <member name="F:Com.MarcusTS.LifecycleAware.ViewModels.ViewModelWithLifecycle._appLifecycleReporter">
+            <summary>
+            The application lifecycle reporter
+            </summary>
+        </member>
+        <member name="F:Com.MarcusTS.LifecycleAware.ViewModels.ViewModelWithLifecycle._isCleaningUp">
+            <summary>
+            The is cleaning up
+            </summary>
+        </member>
+        <member name="F:Com.MarcusTS.LifecycleAware.ViewModels.ViewModelWithLifecycle._pageLifecycleReporter">
+            <summary>
+            The page lifecycle reporter
+            </summary>
+        </member>
+        <member name="P:Com.MarcusTS.LifecycleAware.ViewModels.ViewModelWithLifecycle.AppLifecycleReporter">
+            <summary>
+            Gets or sets the application lifecycle reporter.
+            </summary>
+            <value>The application lifecycle reporter.</value>
+        </member>
+        <member name="P:Com.MarcusTS.LifecycleAware.ViewModels.ViewModelWithLifecycle.IsCleaningUpBeforeFinalization">
+            <summary>
+            Gets or sets a value indicating whether this instance is cleaning up before finalization.
+            </summary>
+            <value><c>true</c> if this instance is cleaning up before finalization; otherwise, <c>false</c>.</value>
+        </member>
+        <member name="P:Com.MarcusTS.LifecycleAware.ViewModels.ViewModelWithLifecycle.PageLifecycleReporter">
+            <summary>
+            Gets or sets the page lifecycle reporter.
+            </summary>
+            <value>The page lifecycle reporter.</value>
+        </member>
+        <member name="M:Com.MarcusTS.LifecycleAware.ViewModels.ViewModelWithLifecycle.OnAppGoingToSleep">
+            <summary>
+            Called when [application going to sleep].
+            </summary>
+        </member>
+        <member name="M:Com.MarcusTS.LifecycleAware.ViewModels.ViewModelWithLifecycle.OnAppResuming">
+            <summary>
+            Called when [application resuming].
+            </summary>
+        </member>
+        <member name="M:Com.MarcusTS.LifecycleAware.ViewModels.ViewModelWithLifecycle.OnAppStarting">
+            <summary>
+            Called when [application starting].
+            </summary>
+        </member>
+        <member name="M:Com.MarcusTS.LifecycleAware.ViewModels.ViewModelWithLifecycle.OnIsCleaningUpBeforeFinalization">
+            <summary>
+            Called when [is cleaning up before finalization].
+            </summary>
+        </member>
+        <member name="M:Com.MarcusTS.LifecycleAware.ViewModels.ViewModelWithLifecycle.OnPageAppearing(System.Object)">
+            <summary>
+            Called when [page appearing].
+            </summary>
+            <param name="val">The value.</param>
+        </member>
+        <member name="M:Com.MarcusTS.LifecycleAware.ViewModels.ViewModelWithLifecycle.OnPageDisappearing(System.Object)">
+            <summary>
+            Called when [page disappearing].
+            </summary>
+            <param name="val">The value.</param>
+        </member>
+        <member name="M:Com.MarcusTS.LifecycleAware.ViewModels.ViewModelWithLifecycle.OnPropertyChanged(System.String)">
+            <summary>
+            Called when [property changed].
+            </summary>
+            <param name="propertyName">Name of the property.</param>
+        </member>
+        <member name="T:Com.MarcusTS.LifecycleAware.Views.Pages.IContentPageWithLifecycle">
+            <summary>
+            Interface IContentPageWithLifecycle
+            Implements the <see cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IHostAppLifecycleReporter" />
+            Implements the <see cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IHostAppLifecycleReporter" />
+            Implements the <see cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IHostAppLifecycleReporter" />
+            Implements the <see cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IReportPageLifecycle" />
+            </summary>
+            <seealso cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IHostAppLifecycleReporter" />
+            <seealso cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IReportPageLifecycle" />
+            <seealso cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IReportPageLifecycle" />
+            <seealso cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IReportPageLifecycle" />
+            <remarks>WARNING: .Net does not provide IContentPage, so references to this interface type *must* type-cast to
+            ContentPage_LCA manually.</remarks>
+        </member>
+        <member name="T:Com.MarcusTS.LifecycleAware.Views.Pages.ContentPageWithLifecycle">
+            <summary>
+            Use this as the basis of all pages if possible. If not possible in a few cases, copy this code into your other
+            classes as-is and it will work the same way.
+            Implements the <see cref="T:Xamarin.Forms.ContentPage" />
+            Implements the <see cref="T:Com.MarcusTS.LifecycleAware.Views.Pages.IContentPageWithLifecycle" />
+            Implements the <see cref="T:Com.MarcusTS.LifecycleAware.Views.Pages.IContentPageWithLifecycle" />
+            Implements the <see cref="T:Xamarin.Forms.ContentPage" />
+            </summary>
+            <seealso cref="T:Xamarin.Forms.ContentPage" />
+            <seealso cref="T:Com.MarcusTS.LifecycleAware.Views.Pages.IContentPageWithLifecycle" />
+            <seealso cref="T:Xamarin.Forms.ContentPage" />
+            <seealso cref="T:Com.MarcusTS.LifecycleAware.Views.Pages.IContentPageWithLifecycle" />
+        </member>
+        <member name="F:Com.MarcusTS.LifecycleAware.Views.Pages.ContentPageWithLifecycle.AppLifecycleReporterProperty">
+            <summary>
+            The application lifecycle reporter property
+            </summary>
+        </member>
+        <member name="F:Com.MarcusTS.LifecycleAware.Views.Pages.ContentPageWithLifecycle._appLifecycleReporter">
+            <summary>
+            The application lifecycle reporter
+            </summary>
+        </member>
+        <member name="M:Com.MarcusTS.LifecycleAware.Views.Pages.ContentPageWithLifecycle.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Com.MarcusTS.LifecycleAware.Views.Pages.ContentPageWithLifecycle"/> class.
+            </summary>
+        </member>
+        <member name="P:Com.MarcusTS.LifecycleAware.Views.Pages.ContentPageWithLifecycle.AppLifecycleReporter">
+            <summary>
+            Gets or sets the application lifecycle reporter.
+            </summary>
+            <value>The application lifecycle reporter.</value>
+        </member>
+        <member name="E:Com.MarcusTS.LifecycleAware.Views.Pages.ContentPageWithLifecycle.PageIsAppearing">
+            <summary>
+            Occurs when [page is appearing].
+            </summary>
+        </member>
+        <member name="E:Com.MarcusTS.LifecycleAware.Views.Pages.ContentPageWithLifecycle.PageIsDisappearing">
+            <summary>
+            Occurs when [page is disappearing].
+            </summary>
+        </member>
+        <member name="M:Com.MarcusTS.LifecycleAware.Views.Pages.ContentPageWithLifecycle.CreateContentPageWithLifecycleBindableProperty``1(System.String,``0,Xamarin.Forms.BindingMode,System.Action{Com.MarcusTS.LifecycleAware.Views.Pages.ContentPageWithLifecycle,``0,``0})">
+            <summary>
+            Creates the content page with lifecycle bindable property.
+            </summary>
+            <typeparam name="PropertyTypeT">The type of the property type t.</typeparam>
+            <param name="localPropName">Name of the local property.</param>
+            <param name="defaultVal">The default value.</param>
+            <param name="bindingMode">The binding mode.</param>
+            <param name="callbackAction">The callback action.</param>
+            <returns>BindableProperty.</returns>
+        </member>
+        <member name="M:Com.MarcusTS.LifecycleAware.Views.Pages.ContentPageWithLifecycle.CreateViewForPage(System.Func{Com.MarcusTS.LifecycleAware.Views.SubViews.ContentViewWithLifecycle},System.Func{Com.MarcusTS.LifecycleAware.ViewModels.ViewModelWithLifecycle})">
+            <summary>
+            Creates the view for page.
+            </summary>
+            <param name="viewCreator">The view creator.</param>
+            <param name="viewModelCreator">The view model creator.</param>
+            <returns>View.</returns>
+            <exception cref="T:System.ArgumentException">viewCreator</exception>
+            <exception cref="T:System.ArgumentException">viewCreator</exception>
+        </member>
+        <member name="M:Com.MarcusTS.LifecycleAware.Views.Pages.ContentPageWithLifecycle.OnAppearing">
+            <summary>
+            When overridden, allows application developers to customize behavior immediately prior to the
+            <see cref="T:Xamarin.Forms.Page" /> becoming visible.
+            </summary>
+            <remarks>To be added.</remarks>
+        </member>
+        <member name="M:Com.MarcusTS.LifecycleAware.Views.Pages.ContentPageWithLifecycle.OnAppGoingToSleep">
+            <summary>
+            Called when [application going to sleep].
+            </summary>
+        </member>
+        <member name="M:Com.MarcusTS.LifecycleAware.Views.Pages.ContentPageWithLifecycle.OnAppResuming">
+            <summary>
+            Called when [application resuming].
+            </summary>
+        </member>
+        <member name="M:Com.MarcusTS.LifecycleAware.Views.Pages.ContentPageWithLifecycle.OnAppStarting">
+            <summary>
+            Called when [application starting].
+            </summary>
+        </member>
+        <member name="M:Com.MarcusTS.LifecycleAware.Views.Pages.ContentPageWithLifecycle.OnDisappearing">
+            <summary>
+            Called when [disappearing].
+            </summary>
+        </member>
+        <member name="T:Com.MarcusTS.LifecycleAware.Views.SubViews.IContentViewWithLifecycle">
+            <summary>
+            Interface IContentViewWithLifecycle
+            Implements the <see cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IHostAppLifecycleReporter" />
+            Implements the <see cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IHostPageLifecycleReporter" />
+            Implements the <see cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.ICleanUpBeforeFinalization" />
+            Implements the <see cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IHostAppLifecycleReporter" />
+            Implements the <see cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IHostPageLifecycleReporter" />
+            Implements the <see cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.ICleanUpBeforeFinalization" />
+            </summary>
+            <seealso cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IHostAppLifecycleReporter" />
+            <seealso cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IHostPageLifecycleReporter" />
+            <seealso cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.ICleanUpBeforeFinalization" />
+            <seealso cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IHostAppLifecycleReporter" />
+            <seealso cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IHostPageLifecycleReporter" />
+            <seealso cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.ICleanUpBeforeFinalization" />
+        </member>
+        <member name="T:Com.MarcusTS.LifecycleAware.Views.SubViews.ContentViewWithLifecycle">
+            <summary>
+            Use this as the basis of all views if possible. If not possible in a few cases, copy this code into your other
+            classes as-is and it will work the same way.
+            Implements the <see cref="T:Xamarin.Forms.ContentView" />
+            Implements the <see cref="T:Com.MarcusTS.LifecycleAware.Views.SubViews.IContentViewWithLifecycle" />
+            Implements the <see cref="T:Com.MarcusTS.LifecycleAware.Views.SubViews.IContentViewWithLifecycle" />
+            Implements the <see cref="T:Xamarin.Forms.ContentView" />
+            </summary>
+            <seealso cref="T:Xamarin.Forms.ContentView" />
+            <seealso cref="T:Com.MarcusTS.LifecycleAware.Views.SubViews.IContentViewWithLifecycle" />
+            <seealso cref="T:Xamarin.Forms.ContentView" />
+            <seealso cref="T:Com.MarcusTS.LifecycleAware.Views.SubViews.IContentViewWithLifecycle" />
+            <remarks>REMEMBER to supply the originating page (PageLifecycleReporterProperty), as that is how all of this works. The
+            event ties are weak and therefore non-binding.</remarks>
+        </member>
+        <member name="M:Com.MarcusTS.LifecycleAware.Views.SubViews.ContentViewWithLifecycle.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Com.MarcusTS.LifecycleAware.Views.SubViews.ContentViewWithLifecycle" /> class.
+            </summary>
+        </member>
+        <member name="E:Com.MarcusTS.LifecycleAware.Views.SubViews.ContentViewWithLifecycle.PageIsDisappearing">
+            <summary>
+            Occurs when [page is disappearing].
+            </summary>
+        </member>
+        <member name="M:Com.MarcusTS.LifecycleAware.Views.SubViews.ContentViewWithLifecycle.CreateContentViewWithLifecycleBindableProperty``1(System.String,``0,Xamarin.Forms.BindingMode,System.Action{Com.MarcusTS.LifecycleAware.Views.SubViews.ContentViewWithLifecycle,``0,``0})">
+            <summary>
+            Creates the content view with lifecycle bindable property.
+            </summary>
+            <typeparam name="PropertyTypeT">The type of the property type t.</typeparam>
+            <param name="localPropName">Name of the local property.</param>
+            <param name="defaultVal">The default value.</param>
+            <param name="bindingMode">The binding mode.</param>
+            <param name="callbackAction">The callback action.</param>
+            <returns>BindableProperty.</returns>
+        </member>
+        <member name="M:Com.MarcusTS.LifecycleAware.Views.SubViews.ContentViewWithLifecycle.Finalize">
+            <summary>
+            Finalizes an instance of the <see cref="T:Com.MarcusTS.LifecycleAware.Views.SubViews.ContentViewWithLifecycle" /> class.
+            </summary>
+        </member>
+        <member name="F:Com.MarcusTS.LifecycleAware.Views.SubViews.ContentViewWithLifecycle.AppLifecycleReporterProperty">
+            <summary>
+            The application lifecycle reporter property
+            </summary>
+        </member>
+        <member name="F:Com.MarcusTS.LifecycleAware.Views.SubViews.ContentViewWithLifecycle.PageLifecycleReporterProperty">
+            <summary>
+            The page lifecycle reporter property
+            </summary>
+        </member>
+        <member name="F:Com.MarcusTS.LifecycleAware.Views.SubViews.ContentViewWithLifecycle._appLifecycleReporter">
+            <summary>
+            The application lifecycle reporter
+            </summary>
+        </member>
+        <member name="F:Com.MarcusTS.LifecycleAware.Views.SubViews.ContentViewWithLifecycle._isCleaningUp">
+            <summary>
+            The is cleaning up
+            </summary>
+        </member>
+        <member name="F:Com.MarcusTS.LifecycleAware.Views.SubViews.ContentViewWithLifecycle._lifecycleReporter">
+            <summary>
+            The lifecycle reporter
+            </summary>
+        </member>
+        <member name="P:Com.MarcusTS.LifecycleAware.Views.SubViews.ContentViewWithLifecycle.AppLifecycleReporter">
+            <summary>
+            Gets or sets the application lifecycle reporter.
+            </summary>
+            <value>The application lifecycle reporter.</value>
+        </member>
+        <member name="P:Com.MarcusTS.LifecycleAware.Views.SubViews.ContentViewWithLifecycle.IsCleaningUpBeforeFinalization">
+            <summary>
+            Gets or sets a value indicating whether this instance is cleaning up before finalization.
+            </summary>
+            <value><c>true</c> if this instance is cleaning up before finalization; otherwise, <c>false</c>.</value>
+        </member>
+        <member name="P:Com.MarcusTS.LifecycleAware.Views.SubViews.ContentViewWithLifecycle.PageLifecycleReporter">
+            <summary>
+            Gets or sets the page lifecycle reporter.
+            </summary>
+            <value>The page lifecycle reporter.</value>
+        </member>
+        <member name="M:Com.MarcusTS.LifecycleAware.Views.SubViews.ContentViewWithLifecycle.OnAppGoingToSleep">
+            <summary>
+            Called when [application going to sleep].
+            </summary>
+        </member>
+        <member name="M:Com.MarcusTS.LifecycleAware.Views.SubViews.ContentViewWithLifecycle.OnAppResuming">
+            <summary>
+            Called when [application resuming].
+            </summary>
+        </member>
+        <member name="M:Com.MarcusTS.LifecycleAware.Views.SubViews.ContentViewWithLifecycle.OnAppStarting">
+            <summary>
+            Called when [application starting].
+            </summary>
+        </member>
+        <member name="M:Com.MarcusTS.LifecycleAware.Views.SubViews.ContentViewWithLifecycle.OnDisappearing(System.Object)">
+            <summary>
+            Called when [disappearing].
+            </summary>
+            <param name="val">The value.</param>
+        </member>
+        <member name="M:Com.MarcusTS.LifecycleAware.Views.SubViews.ContentViewWithLifecycle.OnPageAppearing(System.Object)">
+            <summary>
+            Called when [page appearing].
+            </summary>
+            <param name="val">The value.</param>
+        </member>
+        <member name="M:Com.MarcusTS.LifecycleAware.Views.SubViews.ContentViewWithLifecycle.OnPageAppearing(Xamarin.Forms.ContentPage)">
+            <summary>
+            Called when [page appearing].
+            </summary>
+            <param name="page">The page.</param>
+        </member>
+        <member name="M:Com.MarcusTS.LifecycleAware.Views.SubViews.ContentViewWithLifecycle.OnPageDisappearing(System.Object)">
+            <summary>
+            Called when [page disappearing].
+            </summary>
+            <param name="val">The value.</param>
+        </member>
+        <member name="M:Com.MarcusTS.LifecycleAware.Views.SubViews.ContentViewWithLifecycle.ReleaseUnmanagedResources">
+            <summary>
+            Releases the unmanaged resources.
+            </summary>
+        </member>
+    </members>
+</doc>

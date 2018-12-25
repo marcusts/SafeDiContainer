@@ -1,12 +1,11 @@
-﻿using SharedUtils.Utils;
-
-namespace SmartDIWithLifeCycle.MSTests
+﻿namespace SmartDIWithLifeCycle.MSTests
 {
    using System;
    using System.Collections.Generic;
    using System.Linq;
+   using Com.MarcusTS.SharedUtils.Utils;
+   using Com.MarcusTS.SmartDI;
    using Microsoft.VisualStudio.TestTools.UnitTesting;
-   using SmartDI.Lib;
    using TestClasses;
 
    [TestClass]
@@ -27,16 +26,22 @@ namespace SmartDIWithLifeCycle.MSTests
       }
 
       [TestInitialize]
-      public void SetUpEachTest() => _container.ClearUnitTestExceptions();
+      public void SetUpEachTest()
+      {
+         _container.ClearUnitTestExceptions();
+      }
 
       [TestCleanup]
-      public void TearDownEachTest() => _container.ResetUnitTestContainer();
+      public void TearDownEachTest()
+      {
+         _container.ResetUnitTestContainer();
+      }
 
       [TestMethod]
       public void TestArguments()
       {
-         // Attempt to register an interface as a base type.  Can also use an abstract type, etc.
-         _container.RegisterType<IAmSimple>(StorageRules.DoNotStore);
+         // Attempt to register an interface as a base type.  Can also use an abstract type, as that will fail as well.
+         _container.RegisterType<IAmSimple>(StorageRules.AnyAccessLevel);
          AssertContainerHasThrownArgumentException("Illegally assigned an interface as a base class type.  Interfaces cannot be instantiated.");
 
          _container.ResetUnitTestContainer();
@@ -60,7 +65,7 @@ namespace SmartDIWithLifeCycle.MSTests
          _container.RegisterTypeAsInterface<SimpleClass>(typeof(IAmSimple));
          _container.RegisterTypeAsInterface<AnotherSimpleClass>(typeof(IAmSimple));
          AssertContainerHasThrownArgumentException(
-           "ThrowOnMultipleRegisteredTypesForOneResolvedType is true but no error was thrown for registering two master classes for the same resolved interface.");
+                                                   "ThrowOnMultipleRegisteredTypesForOneResolvedType is true but no error was thrown for registering two master classes for the same resolved interface.");
 
          _container.ResetUnitTestContainer();
 
@@ -86,13 +91,13 @@ namespace SmartDIWithLifeCycle.MSTests
 
          // 1. SetThrowOnAttemptToAssignDuplicateContractSubType to false (default), and try to replace a resolution contract; this will succeed
          _container.ExposedThrowOnAttemptToAssignDuplicateContractSubType = false;
-         _container.RegisterType<SimpleClass>(StorageRules.DoNotStore, null, false, typeof(IAmSimple));
+         _container.RegisterType<SimpleClass>(StorageRules.AnyAccessLevel,      null, false, typeof(IAmSimple));
          _container.RegisterType<SimpleClass>(StorageRules.GlobalSingleton, null, false, typeof(IAmSimple));
          AssertContainerHasRaisedNoExceptions();
 
          // 2. SetThrowOnAttemptToAssignDuplicateContractSubType to true, which should throw an error under the same scenario thatn just succeeded above.
          _container.ExposedThrowOnAttemptToAssignDuplicateContractSubType = true;
-         _container.RegisterType<SimpleClass>(StorageRules.DoNotStore, null, false, typeof(IAmSimple));
+         _container.RegisterType<SimpleClass>(StorageRules.AnyAccessLevel,      null, false, typeof(IAmSimple));
          _container.RegisterType<SimpleClass>(StorageRules.GlobalSingleton, null, false, typeof(IAmSimple));
          AssertContainerHasThrownArgumentException("With ThrowOnAttemptToAssignDuplicateContractSubType true, was allowed to over-write a sub contract.");
       }
@@ -137,7 +142,8 @@ namespace SmartDIWithLifeCycle.MSTests
          var recursiveService = _container.Resolve<IRecursiveService>();
 
          // If  we resolve as a bound dependency using the recursive service, that should be illegal
-         var boundService = _container.Resolve<ServiceOne>(StorageRules.SharedDependencyBetweenInstances, recursiveService);
+         var boundService =
+            _container.Resolve<ServiceOne>(StorageRules.SharedDependencyBetweenInstances, recursiveService);
          AssertContainerHasThrownArgumentException("Was allowed to resolve a service that is bound to a class that derives it.");
       }
 
@@ -155,16 +161,16 @@ namespace SmartDIWithLifeCycle.MSTests
          // Ask to derive the interface without using a conflict resolver
          var simple = _container.Resolve<IAmSimple>();
          Assert.IsTrue(simple is DerivedSimpleClass,
-           "Was given the wrong registered type when I failed to provide a conflict resolver.");
+                       "Was given the wrong registered type when I failed to provide a conflict resolver.");
 
          // Now use the conflict resolver to make the choice -- forbid the DerivedSimpleClass
          simple =
-           _container.Resolve<IAmSimple>
-              (
+            _container.Resolve<IAmSimple>
+               (
                 StorageRules.AnyAccessLevel,
                 null,
                 ForbidSpecificClass<DerivedSimpleClass>
-              );
+               );
 
          Assert.IsFalse(simple is DerivedSimpleClass, "Was given the a type that was forbidden by the resolver.");
       }
@@ -184,7 +190,8 @@ namespace SmartDIWithLifeCycle.MSTests
          // Verify that if we ask for a null global singleton, we get a new global singleton back -- not null
          _container.RegisterType<SimpleClass>(StorageRules.GlobalSingleton);
          var globalClass = _container.Resolve<SimpleClass>();
-         Assert.IsTrue(_container.ExposedGlobalSingletons.ContainsKey(typeof(SimpleClass)), "Failed to store a global singleton after resolve.");
+         Assert.IsTrue(_container.ExposedGlobalSingletons.ContainsKey(typeof(SimpleClass)),
+                       "Failed to store a global singleton after resolve.");
 
          // Kill that instance directly
          _container.ExposedGlobalSingletons[typeof(SimpleClass)] = null;
@@ -206,11 +213,7 @@ namespace SmartDIWithLifeCycle.MSTests
          _container.RegisterType<SimpleClass>(StorageRules.AnyAccessLevel);
          var parent = new ParentClass();
 
-         var testClass = _container.Resolve<SimpleClass>(StorageRules.DoNotStore);
-         AssertContainerHasRaisedNoExceptions();
-         Assert.IsNotNull(testClass, "Could not resolve an 'any' registration as a 'do not store' variable.");
-
-         testClass = _container.Resolve<SimpleClass>(StorageRules.GlobalSingleton);
+         var testClass = _container.Resolve<SimpleClass>(StorageRules.GlobalSingleton);
          AssertContainerHasRaisedNoExceptions();
          Assert.IsNotNull(testClass, "Could not resolve an 'any' registration as a 'global singleton' variable.");
 
@@ -225,9 +228,6 @@ namespace SmartDIWithLifeCycle.MSTests
          _container.RegisterType<SimpleClass>(StorageRules.SharedDependencyBetweenInstances);
 
          // These tests require that we pass in a bound instance
-
-         testClass = _container.Resolve<SimpleClass>(StorageRules.DoNotStore, parent);
-         AssertContainerHasThrownArgumentException("Was allowed to resolve by coercing from 'shared' to 'do not store' illegally.");
 
          _container.ClearUnitTestExceptions();
 
@@ -246,9 +246,6 @@ namespace SmartDIWithLifeCycle.MSTests
 
          _container.RegisterType<SimpleClass>(StorageRules.GlobalSingleton);
 
-         testClass = _container.Resolve<SimpleClass>(StorageRules.DoNotStore);
-         AssertContainerHasThrownArgumentException("Was allowed to resolve by coercing from 'global singleton' to 'do not store' illegally.");
-
          _container.ClearUnitTestExceptions();
 
          testClass = _container.Resolve<SimpleClass>(StorageRules.SharedDependencyBetweenInstances, parent);
@@ -262,19 +259,7 @@ namespace SmartDIWithLifeCycle.MSTests
 
          _container.ResetUnitTestContainer();
 
-         // If registered with a 'do not store' storage level, and resolved with another, will throw (except 'any', which always succeeds)
-
-         _container.RegisterType<SimpleClass>(StorageRules.DoNotStore);
-
-         testClass = _container.Resolve<SimpleClass>(StorageRules.GlobalSingleton);
-         AssertContainerHasThrownArgumentException("Was allowed to resolve by coercing from 'do not store' to 'global singleton' illegally.");
-
-         _container.ClearUnitTestExceptions();
-
-         testClass = _container.Resolve<SimpleClass>(StorageRules.SharedDependencyBetweenInstances, parent);
-         AssertContainerHasThrownArgumentException("Was allowed to resolve by coercing from 'do not store' to 'shared' illegally.");
-
-         _container.ClearUnitTestExceptions();
+         _container.RegisterType<SimpleClass>(StorageRules.AnyAccessLevel);
 
          // Should succeed
          testClass = _container.Resolve<SimpleClass>(StorageRules.AnyAccessLevel);
@@ -283,20 +268,24 @@ namespace SmartDIWithLifeCycle.MSTests
          _container.ResetUnitTestContainer();
 
          // Try to add duplicate storage rules; this should be ignored.
-         _container.RegisterType<SimpleClass>(StorageRules.DoNotStore, () => new SimpleClass());
+         _container.RegisterType<SimpleClass>(StorageRules.AnyAccessLevel, () => new SimpleClass());
 
          // These three statements should now be true
          Assert.IsTrue(_container.ExposedRegisteredTypeContracts.ContainsKey(typeof(SimpleClass)));
-         Assert.IsTrue(_container.ExposedRegisteredTypeContracts[typeof(SimpleClass)].CreatorsAndStorageRules.Keys.Contains(typeof(SimpleClass)));
-         Assert.IsTrue(_container.ExposedRegisteredTypeContracts[typeof(SimpleClass)].CreatorsAndStorageRules.Values.Count == 1);
+         Assert.IsTrue(_container.ExposedRegisteredTypeContracts[typeof(SimpleClass)].CreatorsAndStorageRules.Keys
+                                 .Contains(typeof(SimpleClass)));
+         Assert.IsTrue(_container.ExposedRegisteredTypeContracts[typeof(SimpleClass)].CreatorsAndStorageRules.Values
+                                 .Count == 1);
 
          // Now try to register again using a different constructor for the same type.
-         _container.RegisterType<SimpleClass>(StorageRules.DoNotStore, SimpleClass_Static.CreateSimpleInstance);
+         _container.RegisterType<SimpleClass>(StorageRules.AnyAccessLevel, SimpleClass_Static.CreateSimpleInstance);
 
          // Retest; the conditions should not change, because we cannot legally add two constructors for the same type and storage rule.
          Assert.IsTrue(_container.ExposedRegisteredTypeContracts.ContainsKey(typeof(SimpleClass)));
-         Assert.IsTrue(_container.ExposedRegisteredTypeContracts[typeof(SimpleClass)].CreatorsAndStorageRules.Keys.Contains(typeof(SimpleClass)));
-         Assert.IsTrue(_container.ExposedRegisteredTypeContracts[typeof(SimpleClass)].CreatorsAndStorageRules.Values.Count == 1);
+         Assert.IsTrue(_container.ExposedRegisteredTypeContracts[typeof(SimpleClass)].CreatorsAndStorageRules.Keys
+                                 .Contains(typeof(SimpleClass)));
+         Assert.IsTrue(_container.ExposedRegisteredTypeContracts[typeof(SimpleClass)].CreatorsAndStorageRules.Values
+                                 .Count == 1);
          // NOTE that no error is issued; the new rule over-writes the old one.
 
          // The bound storage rules are complex, so require specialized testing
@@ -330,18 +319,21 @@ namespace SmartDIWithLifeCycle.MSTests
          AssertContainerHasRaisedNoExceptions();
 
          // More importantly, this resolved class should be the same instance as the original test class, since it is shared.
-         Assert.IsTrue(ReferenceEquals(testClass, secondTestClass), "Resolved a 'shared' variable as two separate instances rather than sharing one instance.");
+         Assert.IsTrue(ReferenceEquals(testClass, secondTestClass),
+                       "Resolved a 'shared' variable as two separate instances rather than sharing one instance.");
 
          // If we remove both bound instances...
          _container.ContainerObjectIsDisappearing(parent);
 
          // Last gut check: should still be able to get a shared instance
-         Assert.IsTrue(_container.ExposedSharedInstancesWithBoundMembers.Count == 1, "Removed a shared instance that was not actually orphaned.");
+         Assert.IsTrue(_container.ExposedSharedInstancesWithBoundMembers.Count == 1,
+                       "Removed a shared instance that was not actually orphaned.");
 
          _container.ContainerObjectIsDisappearing(secondParent);
 
          // The shared instance will have no bound parents, so should be removed
-         Assert.IsTrue(_container.ExposedSharedInstancesWithBoundMembers.IsEmpty(), "Left an orphaned shared instance inside the container.");
+         Assert.IsTrue(_container.ExposedSharedInstancesWithBoundMembers.IsEmpty(),
+                       "Left an orphaned shared instance inside the container.");
       }
 
       [TestMethod]
@@ -349,9 +341,11 @@ namespace SmartDIWithLifeCycle.MSTests
       {
          // ALL ACCESS
          _container.RegisterType<SimpleClass>(StorageRules.AnyAccessLevel);
-         Assert.IsTrue(_container.ExposedRegisteredTypeContracts.IsNotEmpty(), "Failed to register a type for any access level.");
+         Assert.IsTrue(_container.ExposedRegisteredTypeContracts.IsNotEmpty(),
+                       "Failed to register a type for any access level.");
          _container.UnregisterTypeContracts<SimpleClass>();
-         Assert.IsTrue(_container.ExposedRegisteredTypeContracts.IsEmpty(), "Failed to unregister a type for any access level.");
+         Assert.IsTrue(_container.ExposedRegisteredTypeContracts.IsEmpty(),
+                       "Failed to unregister a type for any access level.");
 
          _container.ResetUnitTestContainer();
 
@@ -370,7 +364,8 @@ namespace SmartDIWithLifeCycle.MSTests
 
          // GLOBAL SINGLETONS
          _container.RegisterType<SimpleClass>(StorageRules.GlobalSingleton);
-         Assert.IsTrue(_container.ExposedRegisteredTypeContracts.IsNotEmpty(), "Failed to register a global singleton.");
+         Assert.IsTrue(_container.ExposedRegisteredTypeContracts.IsNotEmpty(),
+                       "Failed to register a global singleton.");
          _container.UnregisterTypeContracts<SimpleClass>();
          Assert.IsTrue(_container.ExposedRegisteredTypeContracts.IsEmpty(), "Failed to unregister a global singleton.");
       }
@@ -379,7 +374,8 @@ namespace SmartDIWithLifeCycle.MSTests
 
       #region Private Methods
 
-      private static IConflictResolution ForbidSpecificClass<T>(IDictionary<Type, ITimeStampedCreatorAndStorageRules> registrations)
+      private static IConflictResolution ForbidSpecificClass<T>(
+         IDictionary<Type, ITimeStampedCreatorAndStorageRules> registrations)
       {
          // Find any registration where the key (the main class that was registered and that is being constructed)
          //    is *not* the forbidden one
@@ -390,26 +386,34 @@ namespace SmartDIWithLifeCycle.MSTests
             return null;
          }
 
-         return new ConflictResolution()
-         {
-            MasterType = legalValues.First().Key,
-            TypeToCastWithStorageRule = legalValues.First().Value.CreatorsAndStorageRules.First()
-         };
+         return new ConflictResolution
+                {
+                   MasterType                = legalValues.First().Key,
+                   TypeToCastWithStorageRule = legalValues.First().Value.CreatorsAndStorageRules.First()
+                };
       }
 
       private void AssertContainerHasRaisedNoExceptions()
       {
-         Assert.IsTrue(_container.IsArgumentException.IsEmpty(), "Container threw an unexpected argument exception ->" + _container.IsArgumentException + "<-");
-         Assert.IsTrue(_container.IsOperationException.IsEmpty(), "Container threw an unexpected operation exception ->" + _container.IsOperationException + "<-");
+         Assert.IsTrue(_container.IsArgumentException.IsEmpty(),
+                       "Container threw an unexpected argument exception ->" + _container.IsArgumentException + "<-");
+         Assert.IsTrue(_container.IsOperationException.IsEmpty(),
+                       "Container threw an unexpected operation exception ->" + _container.IsOperationException + "<-");
       }
 
-      private void AssertContainerHasThrownArgumentException(string message) => Assert.IsTrue(_container.IsArgumentException.IsNotEmpty(), message);
+      private void AssertContainerHasThrownArgumentException(string message)
+      {
+         Assert.IsTrue(_container.IsArgumentException.IsNotEmpty(), message);
+      }
 
-      private void AssertContainerHasThrownOperationException(string message) => Assert.IsTrue(_container.IsOperationException.IsNotEmpty(), message);
+      private void AssertContainerHasThrownOperationException(string message)
+      {
+         Assert.IsTrue(_container.IsOperationException.IsNotEmpty(), message);
+      }
 
       private void GlobalSingletonTestByGenericType<InterfaceT, TypeT>()
-                         where TypeT : class, InterfaceT
-       where InterfaceT : class
+         where TypeT : class, InterfaceT
+         where InterfaceT : class
       {
          // Register a type as an interface -- should not be able to fetch it as the base class
          _container.RegisterType<TypeT>(StorageRules.GlobalSingleton, null, false, typeof(InterfaceT));
@@ -426,7 +430,8 @@ namespace SmartDIWithLifeCycle.MSTests
          // Try another instance to verify that it is the same memory reference in memory
          var secondClassAsInterface = _container.Resolve<InterfaceT>();
          AssertContainerHasRaisedNoExceptions();
-         Assert.IsTrue(ReferenceEquals(classAsInterface, secondClassAsInterface), "Two resolves of the same registered global interface returned different instances.");
+         Assert.IsTrue(ReferenceEquals(classAsInterface, secondClassAsInterface),
+                       "Two resolves of the same registered global interface returned different instances.");
 
          _container.ClearUnitTestExceptions();
 
@@ -442,7 +447,8 @@ namespace SmartDIWithLifeCycle.MSTests
          AssertContainerHasRaisedNoExceptions();
 
          // The container must store an additional global instance because they are keyed by type.
-         Assert.IsTrue(_container.ExposedGlobalSingletons.Count == 2, "The container did not store a singleton for both types registered.");
+         Assert.IsTrue(_container.ExposedGlobalSingletons.Count == 2,
+                       "The container did not store a singleton for both types registered.");
 
          // Also must be able to fetch the class
          Assert.IsNotNull(classAsBaseClass, "Failed to acquire a properly registered base class.");

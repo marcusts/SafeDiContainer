@@ -52,7 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Fody">
-      <Version>3.3.3</Version>
+      <Version>3.3.4</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
@@ -102,7 +102,5 @@
       <Name>SmartDIWithLifecycle.Forms</Name>
     </ProjectReference>
   </ItemGroup>
-  <Import Project="..\MtsShared\SharedForms\SharedForms.projitems" Label="Shared" />
-  <Import Project="..\MtsShared\SharedUtils\SharedUtils.projitems" Label="Shared" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
 </Project>

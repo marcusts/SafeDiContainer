@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+          xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+          x:Class="SmartDIWithLifecycle.Forms.FirstPage">
+
+   <StackLayout Margin="50" HorizontalOptions="Center" VerticalOptions="Center">
+      <Label Text="First Page (NO Lifecycle Management)" VerticalOptions="Center" HorizontalOptions="Center" FontSize="Large" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+      <Label Text="{Binding DebugOutput}" VerticalOptions="Center" HorizontalOptions="Center" FontSize="Small" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" Margin="0, 50, 0, 0" TextColor="Green" />
+   </StackLayout>
+</ContentPage>

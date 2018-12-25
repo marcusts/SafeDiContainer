@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Product>Life Cycle Aware Guidance for C# Xamarin Forms Programming</Product>
+    <Company>Marcus Technical Services, Inc.</Company>
+    <Authors>Stephen Marcus</Authors>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>This library provides interfaces and examples to assist the programmer in building pages, views and view models that respond to changes in object lifecycle.  It integrates perfectly with the Smart DI Container, though does not depend on that library.</Description>
+    <Copyright>Copyright @2018 Marcus Technical Services, Inc.</Copyright>
+    <Version>1.0.7</Version>
+    <AssemblyVersion>1.0.7.0</AssemblyVersion>
+    <PackageTags>ioc ioc-container di di-container object-lifecycle smart-di-container xamarin-forms C# lifecycle-aware</PackageTags>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <Optimize>false</Optimize>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DocumentationFile>D:\Dev\MtsShared\LifecycleAware\Com.MarcusTS.LifecycleAware.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Acr.UserDialogs" Version="7.0.1" />
+    <PackageReference Include="Com.MarcusTS.SharedForms" Version="1.0.5" />
+    <PackageReference Include="Com.MarcusTS.SharedUtils" Version="1.0.5" />
+    <PackageReference Include="Fody" Version="3.3.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="PropertyChanged.Fody" Version="2.6.0" />
+    <PackageReference Include="Xamarin.Forms" Version="3.4.0.1008975" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Com.MarcusTS.LifecycleAware.chm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Com.MarcusTS.LifecycleAware.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Com.MarcusTS.LifecyleAware.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="license.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="NETStandard.Library" Version="2.0.2" />
+  </ItemGroup>
+</Project>

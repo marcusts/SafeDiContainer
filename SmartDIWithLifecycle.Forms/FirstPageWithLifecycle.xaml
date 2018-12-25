@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<pages:ContentPageWithLifecycle
+   xmlns="http://xamarin.com/schemas/2014/forms"
+   xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+   xmlns:pages="clr-namespace:Com.MarcusTS.LifecycleAware.Views.Pages;assembly=Com.MarcusTS.LifecycleAware"
+   x:Class="SmartDIWithLifecycle.Forms.FirstPageWithLifecycle"
+>
+   <StackLayout Margin="50" HorizontalOptions="Center" VerticalOptions="Center">
+      <Label Text="First Page (WITH Lifecycle Management)" VerticalOptions="Center" HorizontalOptions="Center" FontSize="Large" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+      <Label Text="{Binding DebugOutput}" VerticalOptions="Center" HorizontalOptions="Center" FontSize="Small" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" Margin="0, 50, 0, 0" TextColor="Green" />
+   </StackLayout>
+</pages:ContentPageWithLifecycle>

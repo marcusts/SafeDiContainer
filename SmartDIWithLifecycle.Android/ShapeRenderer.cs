@@ -25,6 +25,7 @@
 #define ADD_SHADOW
 
 using System.ComponentModel;
+using Com.MarcusTS.SharedForms.Views.Controls;
 using SharedForms.Views.Controls;
 using SmartDIWithLifecycle.Android;
 using Xamarin.Forms;

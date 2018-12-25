@@ -31,7 +31,6 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using SharedForms.Views.Controls;
 using Xamarin.Forms.Platform.Android;
 using Canvas = Android.Graphics.Canvas;
 using Context = Android.Content.Context;
@@ -46,6 +45,9 @@ using View = Android.Views.View;
 
 namespace SmartDIWithLifecycle.Android
 {
+   using Com.MarcusTS.SharedForms.Views.Controls;
+   using SharedForms.Views.Controls;
+
    #region Imports
 
    #endregion Imports
