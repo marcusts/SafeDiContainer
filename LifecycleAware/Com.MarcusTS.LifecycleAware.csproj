@@ -21,9 +21,9 @@
 
   <ItemGroup>
     <PackageReference Include="Acr.UserDialogs" Version="7.0.1" />
-    <PackageReference Include="Com.MarcusTS.SharedForms" Version="1.0.5" />
-    <PackageReference Include="Com.MarcusTS.SharedUtils" Version="1.0.5" />
-    <PackageReference Include="Fody" Version="3.3.3">
+    <PackageReference Include="Com.MarcusTS.SharedForms" Version="1.0.7" />
+    <PackageReference Include="Com.MarcusTS.SharedUtils" Version="1.0.7" />
+    <PackageReference Include="Fody" Version="3.3.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>

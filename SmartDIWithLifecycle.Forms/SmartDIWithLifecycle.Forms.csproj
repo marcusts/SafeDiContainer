@@ -10,16 +10,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Com.MarcusTS.SmartDI" Version="1.0.8" />
+    <PackageReference Include="Com.MarcusTS.LifecycleAware" Version="1.0.8" />
+    <PackageReference Include="Com.MarcusTS.SmartDI" Version="1.0.9" />
     <PackageReference Include="Fody" Version="3.3.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Xamarin.Forms" Version="3.4.0.1008975" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\LifecycleAware\Com.MarcusTS.LifecycleAware.csproj" />
   </ItemGroup>
 
   <ItemGroup>
