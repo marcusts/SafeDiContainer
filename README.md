@@ -1,6 +1,6 @@
-# SafeDiContainer
+# Sample Project: Smart DI and Lifecycle
 
-A type-safe, life-cycle vigilant DI Container (often misdescribed as an "IOC" Container)
+This is a sample project that features the SmartDIlibrary as well as the LifecyelAware guidance.
 
 Also the home of:
 
