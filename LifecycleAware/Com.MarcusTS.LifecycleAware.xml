@@ -4,6 +4,16 @@
         <name>Com.MarcusTS.LifecycleAware</name>
     </assembly>
     <members>
+        <member name="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.ICanDisappearByForce">
+            <summary>
+            Interface ICanDisappearByForce
+            </summary>
+        </member>
+        <member name="M:Com.MarcusTS.LifecycleAware.Common.Interfaces.ICanDisappearByForce.ForceDisappearing">
+            <summary>
+            Forces the disappearing.
+            </summary>
+        </member>
         <member name="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.ICleanUpBeforeFinalization">
             <summary>
             Interface ICleanUpBeforeFinalization
@@ -241,7 +251,9 @@
             Implements the <see cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IHostAppLifecycleReporter" />
             Implements the <see cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IHostAppLifecycleReporter" />
             Implements the <see cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IReportPageLifecycle" />
+            Implements the <see cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.ICanDisappearByForce" />
             </summary>
+            <seealso cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.ICanDisappearByForce" />
             <seealso cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IHostAppLifecycleReporter" />
             <seealso cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IReportPageLifecycle" />
             <seealso cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IReportPageLifecycle" />
@@ -275,7 +287,7 @@
         </member>
         <member name="M:Com.MarcusTS.LifecycleAware.Views.Pages.ContentPageWithLifecycle.#ctor">
             <summary>
-            Initializes a new instance of the <see cref="T:Com.MarcusTS.LifecycleAware.Views.Pages.ContentPageWithLifecycle"/> class.
+            Initializes a new instance of the <see cref="T:Com.MarcusTS.LifecycleAware.Views.Pages.ContentPageWithLifecycle" /> class.
             </summary>
         </member>
         <member name="P:Com.MarcusTS.LifecycleAware.Views.Pages.ContentPageWithLifecycle.AppLifecycleReporter">
@@ -283,6 +295,11 @@
             Gets or sets the application lifecycle reporter.
             </summary>
             <value>The application lifecycle reporter.</value>
+        </member>
+        <member name="M:Com.MarcusTS.LifecycleAware.Views.Pages.ContentPageWithLifecycle.Disappear">
+            <summary>
+            Disappears this instance.
+            </summary>
         </member>
         <member name="E:Com.MarcusTS.LifecycleAware.Views.Pages.ContentPageWithLifecycle.PageIsAppearing">
             <summary>
@@ -315,6 +332,11 @@
             <exception cref="T:System.ArgumentException">viewCreator</exception>
             <exception cref="T:System.ArgumentException">viewCreator</exception>
         </member>
+        <member name="M:Com.MarcusTS.LifecycleAware.Views.Pages.ContentPageWithLifecycle.ForceDisappearing">
+            <summary>
+            Forces the disappearing.
+            </summary>
+        </member>
         <member name="M:Com.MarcusTS.LifecycleAware.Views.Pages.ContentPageWithLifecycle.OnAppearing">
             <summary>
             When overridden, allows application developers to customize behavior immediately prior to the
@@ -341,6 +363,7 @@
             <summary>
             Called when [disappearing].
             </summary>
+            <remarks>To be added.</remarks>
         </member>
         <member name="T:Com.MarcusTS.LifecycleAware.Views.SubViews.IContentViewWithLifecycle">
             <summary>
@@ -351,7 +374,9 @@
             Implements the <see cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IHostAppLifecycleReporter" />
             Implements the <see cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IHostPageLifecycleReporter" />
             Implements the <see cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.ICleanUpBeforeFinalization" />
+            Implements the <see cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.ICanDisappearByForce" />
             </summary>
+            <seealso cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.ICanDisappearByForce" />
             <seealso cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IHostAppLifecycleReporter" />
             <seealso cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.IHostPageLifecycleReporter" />
             <seealso cref="T:Com.MarcusTS.LifecycleAware.Common.Interfaces.ICleanUpBeforeFinalization" />
@@ -385,16 +410,10 @@
             Occurs when [page is disappearing].
             </summary>
         </member>
-        <member name="M:Com.MarcusTS.LifecycleAware.Views.SubViews.ContentViewWithLifecycle.CreateContentViewWithLifecycleBindableProperty``1(System.String,``0,Xamarin.Forms.BindingMode,System.Action{Com.MarcusTS.LifecycleAware.Views.SubViews.ContentViewWithLifecycle,``0,``0})">
+        <member name="M:Com.MarcusTS.LifecycleAware.Views.SubViews.ContentViewWithLifecycle.Disappear">
             <summary>
-            Creates the content view with lifecycle bindable property.
+            Disappears this instance.
             </summary>
-            <typeparam name="PropertyTypeT">The type of the property type t.</typeparam>
-            <param name="localPropName">Name of the local property.</param>
-            <param name="defaultVal">The default value.</param>
-            <param name="bindingMode">The binding mode.</param>
-            <param name="callbackAction">The callback action.</param>
-            <returns>BindableProperty.</returns>
         </member>
         <member name="M:Com.MarcusTS.LifecycleAware.Views.SubViews.ContentViewWithLifecycle.Finalize">
             <summary>
@@ -443,6 +462,22 @@
             Gets or sets the page lifecycle reporter.
             </summary>
             <value>The page lifecycle reporter.</value>
+        </member>
+        <member name="M:Com.MarcusTS.LifecycleAware.Views.SubViews.ContentViewWithLifecycle.CreateContentViewWithLifecycleBindableProperty``1(System.String,``0,Xamarin.Forms.BindingMode,System.Action{Com.MarcusTS.LifecycleAware.Views.SubViews.ContentViewWithLifecycle,``0,``0})">
+            <summary>
+            Creates the content view with lifecycle bindable property.
+            </summary>
+            <typeparam name="PropertyTypeT">The type of the property type t.</typeparam>
+            <param name="localPropName">Name of the local property.</param>
+            <param name="defaultVal">The default value.</param>
+            <param name="bindingMode">The binding mode.</param>
+            <param name="callbackAction">The callback action.</param>
+            <returns>BindableProperty.</returns>
+        </member>
+        <member name="M:Com.MarcusTS.LifecycleAware.Views.SubViews.ContentViewWithLifecycle.ForceDisappearing">
+            <summary>
+            Forces the disappearing.
+            </summary>
         </member>
         <member name="M:Com.MarcusTS.LifecycleAware.Views.SubViews.ContentViewWithLifecycle.OnAppGoingToSleep">
             <summary>

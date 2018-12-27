@@ -2,7 +2,7 @@
 // Assembly         : Com.MarcusTS.LifecycleAware
 // Author           : Stephen Marcus (Marcus Technical Services, Inc.)
 // Created          : 12-24-2018
-// Last Modified On : 12-24-2018
+// Last Modified On : 12-27-2018
 //
 // <copyright file="ContentViewWithLifecycle.cs" company="Marcus Technical Services, Inc.">
 //     Copyright @2018 Marcus Technical Services, Inc.
@@ -47,7 +47,9 @@ namespace Com.MarcusTS.LifecycleAware.Views.SubViews
    /// Implements the <see cref="Com.MarcusTS.LifecycleAware.Common.Interfaces.IHostAppLifecycleReporter" />
    /// Implements the <see cref="Com.MarcusTS.LifecycleAware.Common.Interfaces.IHostPageLifecycleReporter" />
    /// Implements the <see cref="Com.MarcusTS.LifecycleAware.Common.Interfaces.ICleanUpBeforeFinalization" />
+   /// Implements the <see cref="Com.MarcusTS.LifecycleAware.Common.Interfaces.ICanDisappearByForce" />
    /// </summary>
+   /// <seealso cref="Com.MarcusTS.LifecycleAware.Common.Interfaces.ICanDisappearByForce" />
    /// <seealso cref="Com.MarcusTS.LifecycleAware.Common.Interfaces.IHostAppLifecycleReporter" />
    /// <seealso cref="Com.MarcusTS.LifecycleAware.Common.Interfaces.IHostPageLifecycleReporter" />
    /// <seealso cref="Com.MarcusTS.LifecycleAware.Common.Interfaces.ICleanUpBeforeFinalization" />
@@ -55,7 +57,7 @@ namespace Com.MarcusTS.LifecycleAware.Views.SubViews
    /// <seealso cref="IHostPageLifecycleReporter" />
    /// <seealso cref="ICleanUpBeforeFinalization" />
    public interface IContentViewWithLifecycle : IHostAppLifecycleReporter, IHostPageLifecycleReporter,
-                                                ICleanUpBeforeFinalization
+                                                ICleanUpBeforeFinalization, ICanDisappearByForce
    { }
 
    /// <summary>
@@ -84,9 +86,11 @@ namespace Com.MarcusTS.LifecycleAware.Views.SubViews
          BindingContextChanged += (sender,
                                    args) =>
                                   {
-                                     if (BindingContext is IViewModelWithLifecycle bindingContextAsViewModelWithLifecycle)
+                                     if (BindingContext is IViewModelWithLifecycle
+                                            bindingContextAsViewModelWithLifecycle)
                                      {
-                                        bindingContextAsViewModelWithLifecycle.PageLifecycleReporter = PageLifecycleReporter;
+                                        bindingContextAsViewModelWithLifecycle.PageLifecycleReporter =
+                                           PageLifecycleReporter;
                                      }
                                   };
       }
@@ -102,37 +106,19 @@ namespace Com.MarcusTS.LifecycleAware.Views.SubViews
 
       #endregion Public Events
 
-      #region Public Methods
+      #region Private Methods
 
       /// <summary>
-      /// Creates the content view with lifecycle bindable property.
+      /// Disappears this instance.
       /// </summary>
-      /// <typeparam name="PropertyTypeT">The type of the property type t.</typeparam>
-      /// <param name="localPropName">Name of the local property.</param>
-      /// <param name="defaultVal">The default value.</param>
-      /// <param name="bindingMode">The binding mode.</param>
-      /// <param name="callbackAction">The callback action.</param>
-      /// <returns>BindableProperty.</returns>
-      public static BindableProperty CreateContentViewWithLifecycleBindableProperty<PropertyTypeT>(string localPropName,
-                                                                                                   PropertyTypeT
-                                                                                                      defaultVal =
-                                                                                                      default(
-                                                                                                         PropertyTypeT),
-                                                                                                   BindingMode
-                                                                                                      bindingMode =
-                                                                                                      BindingMode
-                                                                                                        .OneWay,
-                                                                                                   Action<
-                                                                                                         ContentViewWithLifecycle
-                                                                                                       , PropertyTypeT,
-                                                                                                         PropertyTypeT>
-                                                                                                      callbackAction =
-                                                                                                      null)
+      private void Disappear()
       {
-         return BindableUtils.CreateBindableProperty(localPropName, defaultVal, bindingMode, callbackAction);
+         PageIsDisappearing?.Invoke(this);
+
+         this.SendObjectDisappearingMessage();
       }
 
-      #endregion Public Methods
+      #endregion Private Methods
 
       #region Private Destructors
 
@@ -300,6 +286,46 @@ namespace Com.MarcusTS.LifecycleAware.Views.SubViews
       }
 
       #endregion Public Properties
+
+      #region Public Methods
+
+      /// <summary>
+      /// Creates the content view with lifecycle bindable property.
+      /// </summary>
+      /// <typeparam name="PropertyTypeT">The type of the property type t.</typeparam>
+      /// <param name="localPropName">Name of the local property.</param>
+      /// <param name="defaultVal">The default value.</param>
+      /// <param name="bindingMode">The binding mode.</param>
+      /// <param name="callbackAction">The callback action.</param>
+      /// <returns>BindableProperty.</returns>
+      public static BindableProperty CreateContentViewWithLifecycleBindableProperty<PropertyTypeT>(string localPropName,
+                                                                                                   PropertyTypeT
+                                                                                                      defaultVal =
+                                                                                                      default(
+                                                                                                         PropertyTypeT),
+                                                                                                   BindingMode
+                                                                                                      bindingMode =
+                                                                                                      BindingMode
+                                                                                                        .OneWay,
+                                                                                                   Action<
+                                                                                                         ContentViewWithLifecycle
+                                                                                                       , PropertyTypeT,
+                                                                                                         PropertyTypeT>
+                                                                                                      callbackAction =
+                                                                                                      null)
+      {
+         return BindableUtils.CreateBindableProperty(localPropName, defaultVal, bindingMode, callbackAction);
+      }
+
+      /// <summary>
+      /// Forces the disappearing.
+      /// </summary>
+      public void ForceDisappearing()
+      {
+         Disappear();
+      }
+
+      #endregion Public Methods
 
       #region Protected Methods
 

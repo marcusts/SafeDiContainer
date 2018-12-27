@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Com.MarcusTS.LifecycleAware</id>
-    <version>1.0.7</version>
+    <version>1.0.10</version>
     <title>Lifecycle Aware Interfaces and Guidance</title>
     <authors>Stephen Marcus</authors>
     <owners>Marcus Technical Services, Inc.</owners>

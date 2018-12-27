@@ -2,7 +2,7 @@
 // Assembly         : Com.MarcusTS.LifecycleAware
 // Author           : Stephen Marcus (Marcus Technical Services, Inc.)
 // Created          : 12-24-2018
-// Last Modified On : 12-24-2018
+// Last Modified On : 12-27-2018
 //
 // <copyright file="ContentPageWithLifecycle.cs" company="Marcus Technical Services, Inc.">
 //     Copyright @2018 Marcus Technical Services, Inc.
@@ -46,14 +46,16 @@ namespace Com.MarcusTS.LifecycleAware.Views.Pages
    /// Implements the <see cref="IHostAppLifecycleReporter" />
    /// Implements the <see cref="Com.MarcusTS.LifecycleAware.Common.Interfaces.IHostAppLifecycleReporter" />
    /// Implements the <see cref="Com.MarcusTS.LifecycleAware.Common.Interfaces.IReportPageLifecycle" />
+   /// Implements the <see cref="Com.MarcusTS.LifecycleAware.Common.Interfaces.ICanDisappearByForce" />
    /// </summary>
+   /// <seealso cref="Com.MarcusTS.LifecycleAware.Common.Interfaces.ICanDisappearByForce" />
    /// <seealso cref="Com.MarcusTS.LifecycleAware.Common.Interfaces.IHostAppLifecycleReporter" />
    /// <seealso cref="Com.MarcusTS.LifecycleAware.Common.Interfaces.IReportPageLifecycle" />
    /// <seealso cref="IReportPageLifecycle" />
    /// <seealso cref="IReportPageLifecycle" />
    /// <remarks>WARNING: .Net does not provide IContentPage, so references to this interface type *must* type-cast to
    /// ContentPage_LCA manually.</remarks>
-   public interface IContentPageWithLifecycle : IHostAppLifecycleReporter, IReportPageLifecycle
+   public interface IContentPageWithLifecycle : IHostAppLifecycleReporter, IReportPageLifecycle, ICanDisappearByForce
    { }
 
    /// <summary>
@@ -103,14 +105,15 @@ namespace Com.MarcusTS.LifecycleAware.Views.Pages
       #region Public Constructors
 
       /// <summary>
-      /// Initializes a new instance of the <see cref="ContentPageWithLifecycle"/> class.
+      /// Initializes a new instance of the <see cref="ContentPageWithLifecycle" /> class.
       /// </summary>
       public ContentPageWithLifecycle()
       {
          BindingContextChanged += (sender,
                                    args) =>
                                   {
-                                     if (BindingContext is IViewModelWithLifecycle bindingContextAsViewModelWithLifecycle)
+                                     if (BindingContext is IViewModelWithLifecycle
+                                            bindingContextAsViewModelWithLifecycle)
                                      {
                                         bindingContextAsViewModelWithLifecycle.PageLifecycleReporter = this;
                                      }
@@ -163,6 +166,20 @@ namespace Com.MarcusTS.LifecycleAware.Views.Pages
       }
 
       #endregion Public Properties
+
+      #region Private Methods
+
+      /// <summary>
+      /// Disappears this instance.
+      /// </summary>
+      private void Disappear()
+      {
+         PageIsDisappearing?.Invoke(this);
+
+         this.SendObjectDisappearingMessage();
+      }
+
+      #endregion Private Methods
 
       #region Public Events
 
@@ -245,6 +262,14 @@ namespace Com.MarcusTS.LifecycleAware.Views.Pages
          return returnView;
       }
 
+      /// <summary>
+      /// Forces the disappearing.
+      /// </summary>
+      public void ForceDisappearing()
+      {
+         Disappear();
+      }
+
       #endregion Public Methods
 
       #region Protected Methods
@@ -282,13 +307,12 @@ namespace Com.MarcusTS.LifecycleAware.Views.Pages
       /// <summary>
       /// Called when [disappearing].
       /// </summary>
+      /// <remarks>To be added.</remarks>
       protected override void OnDisappearing()
       {
          base.OnDisappearing();
 
-         PageIsDisappearing?.Invoke(this);
-
-         this.SendObjectDisappearingMessage();
+         Disappear();
       }
 
       #endregion Protected Methods
